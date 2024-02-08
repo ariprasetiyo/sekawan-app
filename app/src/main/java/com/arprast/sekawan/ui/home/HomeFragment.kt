@@ -1,24 +1,35 @@
 package com.arprast.sekawan.ui.home
 
+import android.app.Activity
+import android.app.AlertDialog
 import android.content.ContentValues
+import android.content.Context
 import android.content.Intent
 import android.net.Uri
 import android.os.Bundle
 import android.provider.MediaStore
+import android.text.InputFilter
+import android.text.InputFilter.LengthFilter
+import android.text.InputType
 import android.view.Gravity
 import android.view.LayoutInflater
 import android.view.MenuItem
 import android.view.View
 import android.view.ViewGroup
+import android.widget.EditText
 import android.widget.ImageView
+import android.widget.LinearLayout
 import android.widget.TextView
-import android.widget.Toast
+import androidx.activity.result.contract.ActivityResultContracts
 import androidx.coordinatorlayout.widget.CoordinatorLayout
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.FragmentActivity
+import androidx.fragment.app.FragmentManager
 import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProviders
+import com.arprast.sekawan.type.RegistrationActivityType
 import com.arprast.sekawan.util.Utils
+import com.arprast.sekawan.util.Utils.DatePickerFragment
 import com.arprastandroid.R
 import com.bumptech.glide.Glide
 import com.bumptech.glide.request.RequestOptions
@@ -30,13 +41,11 @@ import com.google.android.material.snackbar.Snackbar
 class HomeFragment : Fragment() {
 
     private lateinit var homeViewModel: HomeViewModel
-    lateinit var clickImageId: ImageView
-    private lateinit var imageUri: Uri
     private lateinit var fragmentActivity: FragmentActivity
-
-    companion object {
-        private const val PICTURE_CAM_ID = 123
-    }
+    private lateinit var clickImageId: ImageView
+    private lateinit var imageUri: Uri
+    private var registerId: RegistrationActivityType = RegistrationActivityType.NOTHING
+    private lateinit var fragmentManager: FragmentManager
 
     override fun onCreateView(
         inflater: LayoutInflater,
@@ -53,12 +62,11 @@ class HomeFragment : Fragment() {
             fragmentActivity = it
             val bottomNavigationView =
                 root.findViewById(R.id.home_bottom_navigation) as BottomNavigationView
-            openCam(bottomNavigationView, it)
+            mainMenu(bottomNavigationView, it)
+            fragmentManager = (context as FragmentActivity).supportFragmentManager
         }
 
-        /**
-         * disabled email hover menu
-         */
+        /** disabled email hover menu */
         val fab: FloatingActionButton = root.findViewById(R.id.fab)
         fab.setOnClickListener { view ->
 
@@ -79,30 +87,22 @@ class HomeFragment : Fragment() {
         return root
     }
 
-    private fun openCam(bottomNavigationView: BottomNavigationView, it: FragmentActivity) {
+    private fun mainMenu(bottomNavigationView: BottomNavigationView, it: FragmentActivity) {
 
         bottomNavigationView.setOnNavigationItemSelectedListener(object :
             BottomNavigationView.OnNavigationItemSelectedListener {
             override fun onNavigationItemSelected(menuItem: MenuItem): Boolean {
                 when (menuItem.getItemId()) {
                     R.id.home_menu_trx -> {
-                        tostText("trx list not yet support")
+                        Utils.showTost(requireContext(), "trx list not yet support")
                     }
 
                     R.id.home_menu_open_cam -> {
-
-                        val values = ContentValues()
-                        imageUri = fragmentActivity.contentResolver.insert(
-                            MediaStore.Images.Media.EXTERNAL_CONTENT_URI,
-                            values
-                        )!!
-                        val cameraIntent = Intent(MediaStore.ACTION_IMAGE_CAPTURE)
-                        cameraIntent.putExtra(MediaStore.EXTRA_OUTPUT, imageUri)
-                        startActivityForResult(cameraIntent, PICTURE_CAM_ID)
+                        doOpenCam()
                     }
 
                     R.id.home_menu_notification -> {
-                        tostText("notification not yet support")
+                        Utils.showTost(requireContext(), "notification not yet support")
                     }
                 }
                 return true
@@ -110,21 +110,27 @@ class HomeFragment : Fragment() {
         })
     }
 
-    override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
-        super.onActivityResult(requestCode, resultCode, data)
+    private fun doOpenCam() {
 
-        // Match the request 'pic id with requestCode
-        if (requestCode == PICTURE_CAM_ID) {
+        registerId = RegistrationActivityType.OPEN_CAM_FOR_PHOTO
+        val values = ContentValues()
+        imageUri = fragmentActivity.contentResolver.insert(
+            MediaStore.Images.Media.EXTERNAL_CONTENT_URI,
+            values
+        )!!
 
-            // BitMap is data structure of image file which store the image in memory
-            //val photo = data!!.extras!!["data"] as Bitmap?
-            // Set the image in imageview for display
-            //  clickImageId.setImageBitmap(photo)
+        val cameraIntent = Intent(MediaStore.ACTION_IMAGE_CAPTURE)
+        cameraIntent.putExtra(MediaStore.EXTRA_OUTPUT, imageUri)
 
-            // traditional method load image
-            // val thumbnail = MediaStore.Images.Media.getBitmap(fragmentActivity.contentResolver, imageUri)
-            // clickImageId.setImageBitmap(thumbnail)
+//        activity?.setResult(Activity.RESULT_OK)
+//        activity?.finish()
+        startActivityIntent.launch(cameraIntent)
+    }
 
+    private var startActivityIntent = registerForActivityResult(
+        ActivityResultContracts.StartActivityForResult()
+    ) {
+        if (it.resultCode == Activity.RESULT_OK && registerId == RegistrationActivityType.OPEN_CAM_FOR_PHOTO) {
             val thumbnail =
                 MediaStore.Images.Media.getBitmap(fragmentActivity.contentResolver, imageUri)
             clickImageId.setImageBitmap(thumbnail)
@@ -133,17 +139,75 @@ class HomeFragment : Fragment() {
                 .centerCrop()
                 .placeholder(R.mipmap.ic_launcher_round)
                 .error(R.mipmap.ic_launcher_round)
-            Glide.with(fragmentActivity).load(Utils.getPathImage(imageUri, context)).apply(options).into(clickImageId);
+            Glide.with(fragmentActivity).load(Utils.getPathImage(imageUri, context)).apply(options)
+                .into(clickImageId)
 
+            showDialogTextInputLayout(this.requireContext())
         }
     }
 
-    private fun tostText(text: String) {
+    private fun showDialogTextInputLayout(context: Context) {
 
-        val invalidateInputMesssage =
-            Toast.makeText(requireContext(), text, Toast.LENGTH_LONG)
-        invalidateInputMesssage.setGravity(Gravity.CENTER, 0, 0)
-        invalidateInputMesssage.show()
+        val layout = LinearLayout(context)
+        layout.orientation = LinearLayout.VERTICAL
+        layout.setPadding(
+            resources.getDimensionPixelOffset(R.dimen.dp_19),
+            0,
+            resources.getDimensionPixelOffset(R.dimen.dp_19),
+            0
+        )
 
+        val customerName = EditText(context)
+        customerName.hint = getString(R.string.input_customer_name)
+        layout.addView(customerName)
+
+        val customerPhoneNumber = EditText(context)
+        customerPhoneNumber.hint = getString(R.string.input_customer_phone_number)
+        customerPhoneNumber.inputType = InputType.TYPE_CLASS_NUMBER
+        customerPhoneNumber.filters = (arrayOf<InputFilter>(LengthFilter(14)))
+        layout.addView(customerPhoneNumber)
+
+        customerPhoneNumber.onFocusChangeListener = (object : View.OnFocusChangeListener {
+            override fun onFocusChange(view: View?, hasFocus: Boolean) {
+                if (!hasFocus) {
+                    val isValidPhoneNo = Utils.isValidPhoneNumber(customerPhoneNumber.text.toString())
+                    if(!isValidPhoneNo){
+                        customerPhoneNumber.hint = getString(R.string.input_customer_phone_number_warning)
+                        customerPhoneNumber.setHintTextColor(getResources().getColor(R.color.redColor))
+                        customerPhoneNumber.text.clear()
+                    }
+                }
+            }
+        })
+
+        val address = EditText(context)
+        address.hint = getString(R.string.input_customer_address)
+        layout.addView(address)
+
+        val estimationDate = EditText(context)
+        estimationDate.hint = getString(R.string.input_customer_estimation_date)
+        layout.addView(estimationDate)
+
+        estimationDate.onFocusChangeListener = (object : View.OnFocusChangeListener {
+            override fun onFocusChange(p0: View?, hasFocus: Boolean) {
+                if (hasFocus) {
+                    val dialogFragment = DatePickerFragment(estimationDate)
+                    dialogFragment.show(fragmentManager, "datePicker")
+                }
+            }
+        })
+
+        val alert = AlertDialog.Builder(context)
+            .setTitle("Input data customer")
+            .setView(layout)
+            .setMessage("Please input the data")
+            .setPositiveButton("Submit") { dialog, _ ->
+                dialog.cancel()
+            }
+            .setNeutralButton("Cancel") { dialog, _ ->
+                dialog.cancel()
+            }.create()
+
+        alert.show()
     }
 }
