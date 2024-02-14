@@ -18,11 +18,22 @@ import androidx.fragment.app.DialogFragment;
 import java.text.SimpleDateFormat;
 import java.util.Calendar;
 import java.util.Date;
+import java.util.Random;
 
 public class Utils {
 
     private final static SimpleDateFormat ddMMyyyy = new SimpleDateFormat("dd/MM/yyyy");
+    private final static SimpleDateFormat yyyyMMddhhmmssWithoutSlash = new SimpleDateFormat("yyyyMMddhhmmssSSS");
+    private static final String ALLOWED_CHARACTERS ="0123456789qwertyuiopasdfghjklzxcvbnm";
 
+    private static String getRandomString(final int sizeOfRandomString)
+    {
+        final Random random=new Random();
+        final StringBuilder sb=new StringBuilder(sizeOfRandomString);
+        for(int i=0;i<sizeOfRandomString;++i)
+            sb.append(ALLOWED_CHARACTERS.charAt(random.nextInt(ALLOWED_CHARACTERS.length())));
+        return sb.toString();
+    }
     public static String getPathImage(Context context, Uri uri ) {
         String[]  data = { MediaStore.Images.Media.DATA };
         CursorLoader loader = new CursorLoader(context, uri, data, null, null, null);
@@ -50,6 +61,14 @@ public class Utils {
     public static String getDateNow () {
         final Date today = Calendar.getInstance().getTime();
         return ddMMyyyy.format(today);
+    }
+
+   public static String getTrxNo(){
+        final StringBuilder stringBuilder = new StringBuilder();
+        stringBuilder.append( yyyyMMddhhmmssWithoutSlash.format(Calendar.getInstance().getTime()));
+        stringBuilder.append("-");
+        stringBuilder.append(getRandomString(10));
+        return stringBuilder.toString();
     }
 
     public static void showTost( Context context, String text) {

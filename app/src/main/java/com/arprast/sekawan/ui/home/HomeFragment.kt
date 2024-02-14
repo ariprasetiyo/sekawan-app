@@ -40,7 +40,6 @@ import com.google.android.material.floatingactionbutton.FloatingActionButton
 import com.google.android.material.snackbar.Snackbar
 import java.io.File
 
-
 class HomeFragment : Fragment() {
 
     private lateinit var homeViewModel: HomeViewModel
@@ -166,12 +165,33 @@ class HomeFragment : Fragment() {
             0
         )
 
+        layout.addView(inputCustomerName())
+        layout.addView(inputCustomerPhoneNumber())
+        layout.addView(inputCustomerEstimationDate())
+        layout.addView(inputCustomerAddress())
+        layout.addView(inputCustomerNote())
+
+        val dateNow = Utils.getDateNow()
+        val alert = AlertDialog.Builder(context)
+            .setTitle("${getString(R.string.input_customer_title)} $dateNow")
+            .setMessage("Trx No ${Utils.getTrxNo()}")
+            .setView(layout)
+            .setPositiveButton(getString(R.string.button_save)) { dialog, _ ->
+                dialog.cancel()
+            }
+            .setNeutralButton(getString(R.string.button_cancel)) { dialog, _ ->
+                deleteFileImageCam()
+                dialog.cancel()
+            }.create()
+
+        alert.show()
+    }
+
+    private fun inputCustomerName() : EditText{
         val customerName = EditText(context)
         customerName.hint = getString(R.string.input_customer_name)
         customerName.filters = (arrayOf<InputFilter>(LengthFilter(50)))
         customerName.isSingleLine = true
-        layout.addView(customerName)
-
         customerName.onFocusChangeListener = (object : View.OnFocusChangeListener {
             override fun onFocusChange(view: View?, hasFocus: Boolean) {
                 if (!hasFocus) {
@@ -183,13 +203,14 @@ class HomeFragment : Fragment() {
                 }
             }
         })
+        return customerName
+    }
 
+    private fun inputCustomerPhoneNumber() : EditText{
         val customerPhoneNumber = EditText(context)
         customerPhoneNumber.hint = getString(R.string.input_customer_phone_number)
         customerPhoneNumber.inputType = (InputType.TYPE_CLASS_NUMBER)
         customerPhoneNumber.filters = (arrayOf<InputFilter>(LengthFilter(14)))
-        layout.addView(customerPhoneNumber)
-
         customerPhoneNumber.onFocusChangeListener = (object : View.OnFocusChangeListener {
             override fun onFocusChange(view: View?, hasFocus: Boolean) {
                 if (!hasFocus) {
@@ -204,11 +225,12 @@ class HomeFragment : Fragment() {
                 }
             }
         })
+        return customerPhoneNumber
+    }
 
+    private fun inputCustomerEstimationDate() : EditText{
         val estimationDate = EditText(context)
         estimationDate.hint = getString(R.string.input_customer_estimation_date)
-        layout.addView(estimationDate)
-
         estimationDate.onFocusChangeListener = (object : View.OnFocusChangeListener {
             override fun onFocusChange(p0: View?, hasFocus: Boolean) {
                 if (hasFocus) {
@@ -217,36 +239,27 @@ class HomeFragment : Fragment() {
                 }
             }
         })
+        return estimationDate
+    }
 
+    private fun inputCustomerAddress() : EditText{
         val address = EditText(context)
         address.hint = getString(R.string.input_customer_address)
         address.isSingleLine = false
         address.imeOptions = EditorInfo.IME_FLAG_NO_ENTER_ACTION
         address.setRawInputType(InputType.TYPE_TEXT_FLAG_CAP_SENTENCES or InputType.TYPE_TEXT_FLAG_MULTI_LINE)
         address.filters = (arrayOf<InputFilter>(LengthFilter(150)))
-        layout.addView(address)
+        return address
+    }
 
+    private fun inputCustomerNote() : EditText{
         val note = EditText(context)
         note.hint = getString(R.string.input_customer_note)
         note.isSingleLine = false
         note.imeOptions = EditorInfo.IME_FLAG_NO_ENTER_ACTION
         note.setRawInputType(InputType.TYPE_TEXT_FLAG_CAP_SENTENCES or InputType.TYPE_TEXT_FLAG_MULTI_LINE)
         note.filters = (arrayOf<InputFilter>(LengthFilter(150)))
-        layout.addView(note)
-
-        val dateNow = Utils.getDateNow()
-        val alert = AlertDialog.Builder(context)
-            .setTitle("${R.string.input_customer_title} $dateNow")
-            .setView(layout)
-            .setPositiveButton(R.string.button_save) { dialog, _ ->
-                dialog.cancel()
-            }
-            .setNeutralButton(R.string.button_cancel) { dialog, _ ->
-                deleteFileImageCam()
-                dialog.cancel()
-            }.create()
-
-        alert.show()
+        return note;
     }
 
     private fun deleteFileImageCam() {
