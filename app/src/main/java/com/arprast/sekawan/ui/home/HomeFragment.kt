@@ -16,6 +16,7 @@ import android.view.LayoutInflater
 import android.view.MenuItem
 import android.view.View
 import android.view.ViewGroup
+import android.view.inputmethod.EditorInfo
 import android.widget.EditText
 import android.widget.ImageView
 import android.widget.LinearLayout
@@ -30,12 +31,14 @@ import androidx.lifecycle.ViewModelProviders
 import com.arprast.sekawan.type.RegistrationActivityType
 import com.arprast.sekawan.util.Utils
 import com.arprast.sekawan.util.Utils.DatePickerFragment
+import com.arprast.sekawan.util.Utils.showTost
 import com.arprastandroid.R
 import com.bumptech.glide.Glide
 import com.bumptech.glide.request.RequestOptions
 import com.google.android.material.bottomnavigation.BottomNavigationView
 import com.google.android.material.floatingactionbutton.FloatingActionButton
 import com.google.android.material.snackbar.Snackbar
+import java.io.File
 
 
 class HomeFragment : Fragment() {
@@ -114,14 +117,16 @@ class HomeFragment : Fragment() {
 
         registerId = RegistrationActivityType.OPEN_CAM_FOR_PHOTO
         val values = ContentValues()
+        values.put(MediaStore.Images.Media.DISPLAY_NAME, "testing");
+        values.put(MediaStore.Images.Media.DESCRIPTION, "this is description");
+        values.put(MediaStore.Images.Media.MIME_TYPE, "image/jpeg")
+
         imageUri = fragmentActivity.contentResolver.insert(
             MediaStore.Images.Media.EXTERNAL_CONTENT_URI,
             values
         )!!
-
         val cameraIntent = Intent(MediaStore.ACTION_IMAGE_CAPTURE)
         cameraIntent.putExtra(MediaStore.EXTRA_OUTPUT, imageUri)
-
 //        activity?.setResult(Activity.RESULT_OK)
 //        activity?.finish()
         startActivityIntent.launch(cameraIntent)
@@ -131,19 +136,23 @@ class HomeFragment : Fragment() {
         ActivityResultContracts.StartActivityForResult()
     ) {
         if (it.resultCode == Activity.RESULT_OK && registerId == RegistrationActivityType.OPEN_CAM_FOR_PHOTO) {
-            val thumbnail =
-                MediaStore.Images.Media.getBitmap(fragmentActivity.contentResolver, imageUri)
-            clickImageId.setImageBitmap(thumbnail)
-
-            val options = RequestOptions()
-                .centerCrop()
-                .placeholder(R.mipmap.ic_launcher_round)
-                .error(R.mipmap.ic_launcher_round)
-            Glide.with(fragmentActivity).load(Utils.getPathImage(imageUri, context)).apply(options)
-                .into(clickImageId)
-
-            showDialogTextInputLayout(this.requireContext())
+            showImageCam()
         }
+    }
+
+    private fun showImageCam() {
+        val thumbnail =
+            MediaStore.Images.Media.getBitmap(fragmentActivity.contentResolver, imageUri)
+        clickImageId.setImageBitmap(thumbnail)
+
+        val options = RequestOptions()
+            .centerCrop()
+            .placeholder(R.mipmap.ic_launcher_round)
+            .error(R.mipmap.ic_launcher_round)
+        Glide.with(fragmentActivity).load(Utils.getPathImage(context, imageUri)).apply(options)
+            .into(clickImageId)
+
+        showDialogTextInputLayout(this.requireContext())
     }
 
     private fun showDialogTextInputLayout(context: Context) {
@@ -159,30 +168,42 @@ class HomeFragment : Fragment() {
 
         val customerName = EditText(context)
         customerName.hint = getString(R.string.input_customer_name)
+        customerName.filters = (arrayOf<InputFilter>(LengthFilter(50)))
+        customerName.isSingleLine = true
         layout.addView(customerName)
+
+        customerName.onFocusChangeListener = (object : View.OnFocusChangeListener {
+            override fun onFocusChange(view: View?, hasFocus: Boolean) {
+                if (!hasFocus) {
+                    if (customerName.text.isBlank()) {
+                        customerName.hint = getString(R.string.input_customer_name_warning)
+                        customerName.setHintTextColor(getResources().getColor(R.color.redColor))
+                        customerName.text.clear()
+                    }
+                }
+            }
+        })
 
         val customerPhoneNumber = EditText(context)
         customerPhoneNumber.hint = getString(R.string.input_customer_phone_number)
-        customerPhoneNumber.inputType = InputType.TYPE_CLASS_NUMBER
+        customerPhoneNumber.inputType = (InputType.TYPE_CLASS_NUMBER)
         customerPhoneNumber.filters = (arrayOf<InputFilter>(LengthFilter(14)))
         layout.addView(customerPhoneNumber)
 
         customerPhoneNumber.onFocusChangeListener = (object : View.OnFocusChangeListener {
             override fun onFocusChange(view: View?, hasFocus: Boolean) {
                 if (!hasFocus) {
-                    val isValidPhoneNo = Utils.isValidPhoneNumber(customerPhoneNumber.text.toString())
-                    if(!isValidPhoneNo){
-                        customerPhoneNumber.hint = getString(R.string.input_customer_phone_number_warning)
+                    val isValidPhoneNo =
+                        Utils.isValidPhoneNumber(customerPhoneNumber.text.toString())
+                    if (!isValidPhoneNo) {
+                        customerPhoneNumber.hint =
+                            getString(R.string.input_customer_phone_number_warning)
                         customerPhoneNumber.setHintTextColor(getResources().getColor(R.color.redColor))
                         customerPhoneNumber.text.clear()
                     }
                 }
             }
         })
-
-        val address = EditText(context)
-        address.hint = getString(R.string.input_customer_address)
-        layout.addView(address)
 
         val estimationDate = EditText(context)
         estimationDate.hint = getString(R.string.input_customer_estimation_date)
@@ -197,17 +218,45 @@ class HomeFragment : Fragment() {
             }
         })
 
+        val address = EditText(context)
+        address.hint = getString(R.string.input_customer_address)
+        address.isSingleLine = false
+        address.imeOptions = EditorInfo.IME_FLAG_NO_ENTER_ACTION
+        address.setRawInputType(InputType.TYPE_TEXT_FLAG_CAP_SENTENCES or InputType.TYPE_TEXT_FLAG_MULTI_LINE)
+        address.filters = (arrayOf<InputFilter>(LengthFilter(150)))
+        layout.addView(address)
+
+        val note = EditText(context)
+        note.hint = getString(R.string.input_customer_note)
+        note.isSingleLine = false
+        note.imeOptions = EditorInfo.IME_FLAG_NO_ENTER_ACTION
+        note.setRawInputType(InputType.TYPE_TEXT_FLAG_CAP_SENTENCES or InputType.TYPE_TEXT_FLAG_MULTI_LINE)
+        note.filters = (arrayOf<InputFilter>(LengthFilter(150)))
+        layout.addView(note)
+
+        val dateNow = Utils.getDateNow()
         val alert = AlertDialog.Builder(context)
-            .setTitle("Input data customer")
+            .setTitle("${R.string.input_customer_title} $dateNow")
             .setView(layout)
-            .setMessage("Please input the data")
-            .setPositiveButton("Submit") { dialog, _ ->
+            .setPositiveButton(R.string.button_save) { dialog, _ ->
                 dialog.cancel()
             }
-            .setNeutralButton("Cancel") { dialog, _ ->
+            .setNeutralButton(R.string.button_cancel) { dialog, _ ->
+                deleteFileImageCam()
                 dialog.cancel()
             }.create()
 
         alert.show()
+    }
+
+    private fun deleteFileImageCam() {
+        val finalFilePath = Utils.getPathImage(this.context, imageUri)
+        showTost(requireContext(), "found $finalFilePath")
+        val fdelete = File(finalFilePath)
+        if (fdelete.delete()) {
+            showTost(context, "file deleted :")
+        } else {
+            showTost(context, "file not deleted : ")
+        }
     }
 }

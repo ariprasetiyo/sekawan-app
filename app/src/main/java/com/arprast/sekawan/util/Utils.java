@@ -15,16 +15,41 @@ import android.widget.Toast;
 
 import androidx.fragment.app.DialogFragment;
 
+import java.text.SimpleDateFormat;
 import java.util.Calendar;
+import java.util.Date;
 
 public class Utils {
-    public static String getPathImage(Uri uri, Context context) {
+
+    private final static SimpleDateFormat ddMMyyyy = new SimpleDateFormat("dd/MM/yyyy");
+
+    public static String getPathImage(Context context, Uri uri ) {
         String[]  data = { MediaStore.Images.Media.DATA };
         CursorLoader loader = new CursorLoader(context, uri, data, null, null, null);
         Cursor cursor = loader.loadInBackground();
         int column_index = cursor.getColumnIndexOrThrow(MediaStore.Images.Media.DATA);
         cursor.moveToFirst();
         return cursor.getString(column_index);
+    }
+
+    //    public String getFilePath(Context context, Uri uri) {
+//        String[] projection = {MediaStore.Images.Media.DATA};
+//
+//        Cursor cursor = context.getContentResolver().query(uri, projection, null, null, null);
+//        if (cursor != null) {
+//            cursor.moveToFirst();
+//
+//            int columnIndex = cursor.getColumnIndex(projection[0]);
+//            String picturePath = cursor.getString(columnIndex); // returns null
+//            cursor.close();
+//            return picturePath;
+//        }
+//        return null;
+//    }
+
+    public static String getDateNow () {
+        final Date today = Calendar.getInstance().getTime();
+        return ddMMyyyy.format(today);
     }
 
     public static void showTost( Context context, String text) {
