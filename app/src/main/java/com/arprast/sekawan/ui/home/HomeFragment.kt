@@ -29,6 +29,7 @@ import androidx.fragment.app.FragmentManager
 import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProviders
 import com.arprast.sekawan.type.RegistrationActivityType
+import com.arprast.sekawan.ui.media.account.AddAccount
 import com.arprast.sekawan.util.Utils
 import com.arprast.sekawan.util.Utils.DatePickerFragment
 import com.arprast.sekawan.util.Utils.showTost
@@ -49,44 +50,57 @@ class HomeFragment : Fragment() {
     private var registerId: RegistrationActivityType = RegistrationActivityType.NOTHING
     private lateinit var fragmentManager: FragmentManager
 
+    private fun openFragment(fragment: Fragment) {
+        val transaction = activity?.supportFragmentManager?.beginTransaction()
+        transaction?.replace(R.id.container, fragment)
+        transaction?.addToBackStack(null)
+        transaction?.commit()
+    }
     override fun onCreateView(
         inflater: LayoutInflater,
         container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View? {
+        if(true){
+            val root = inflater.inflate(R.layout.fragment_login, container, false)
+            activity?.let {
+                fragmentActivity = it
+                fragmentManager = (context as FragmentActivity).supportFragmentManager
+            }
+            return root
+        } else{
+            homeViewModel = ViewModelProviders.of(this).get(HomeViewModel::class.java)
+            val root = inflater.inflate(R.layout.fragment_home, container, false)
+            clickImageId = root.findViewById(R.id.view_open_cam)
 
-        homeViewModel =
-            ViewModelProviders.of(this).get(HomeViewModel::class.java)
-        val root = inflater.inflate(R.layout.fragment_home, container, false)
-        clickImageId = root.findViewById(R.id.view_open_cam)
+            activity?.let {
+                fragmentActivity = it
+                val bottomNavigationView =
+                    root.findViewById(R.id.home_bottom_navigation) as BottomNavigationView
+                mainMenu(bottomNavigationView, it)
+                fragmentManager = (context as FragmentActivity).supportFragmentManager
+            }
 
-        activity?.let {
-            fragmentActivity = it
-            val bottomNavigationView =
-                root.findViewById(R.id.home_bottom_navigation) as BottomNavigationView
-            mainMenu(bottomNavigationView, it)
-            fragmentManager = (context as FragmentActivity).supportFragmentManager
+            /** disabled email hover menu */
+            val fab: FloatingActionButton = root.findViewById(R.id.fab)
+            fab.setOnClickListener { view ->
+
+                val snackbar = Snackbar.make(view, "Replace with your own action", Snackbar.LENGTH_LONG)
+
+                val view: View = snackbar.getView()
+                val params = view.layoutParams as CoordinatorLayout.LayoutParams
+                params.gravity = Gravity.TOP
+                view.layoutParams = params
+                snackbar.setAction("Action", null).show()
+            }
+
+            val textView: TextView = root.findViewById(R.id.text_home)
+            homeViewModel.text.observe(viewLifecycleOwner, Observer {
+                textView.text = it
+            })
+
+            return root
         }
-
-        /** disabled email hover menu */
-        val fab: FloatingActionButton = root.findViewById(R.id.fab)
-        fab.setOnClickListener { view ->
-
-            val snackbar = Snackbar.make(view, "Replace with your own action", Snackbar.LENGTH_LONG)
-
-            val view: View = snackbar.getView()
-            val params = view.layoutParams as CoordinatorLayout.LayoutParams
-            params.gravity = Gravity.TOP
-            view.layoutParams = params
-            snackbar.setAction("Action", null).show()
-        }
-
-        val textView: TextView = root.findViewById(R.id.text_home)
-        homeViewModel.text.observe(viewLifecycleOwner, Observer {
-            textView.text = it
-        })
-
-        return root
     }
 
     private fun mainMenu(bottomNavigationView: BottomNavigationView, it: FragmentActivity) {

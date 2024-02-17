@@ -1,3 +1,4 @@
+<?xml version="1.0" encoding="utf-8"?>
 <resources>
     <string name="app_name">Somed</string>
     <string name="navigation_drawer_open">Open navigation drawer</string>
@@ -32,6 +33,11 @@
     <string name="input_customer_note">Note</string>
     <string name="input_customer_estimation_date">Estimation Date</string>
 
+    <string name="login_submit_button">Login</string>
+    <string name="login_input_username_or_email">Username or Email</string>
+    <string name="login_input_password">Password</string>
+    <string name="login_register">To register click here for <![CDATA[ <a href="" style="color: #03A9F4;text-decoration:none" >sign up</a> ]]></string>
+
     <color name="whiteColor">#ffffff</color>
     <color name="redColor">#E80505</color>
     <color name="grayColor">#A1FFFFFF</color>
@@ -40,6 +46,7 @@
     <color name="movieTitle">#797979</color>
     <color name="yearTitle">#CC8BDA</color>
     <color name="rateTitle">#CFC767</color>
+    <color name="blue">#03A9F4</color>
 
     <!-- TODO: Remove or change this placeholder text -->
     <string name="hello_blank_fragment">Hello blank fragment</string>
