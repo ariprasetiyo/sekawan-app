@@ -16,7 +16,6 @@ import androidx.fragment.app.Fragment
 import androidx.fragment.app.FragmentActivity
 import androidx.fragment.app.FragmentManager
 import com.arprast.sekawan.util.PreferanceVariable
-import com.arprast.sekawan.util.Utils
 import com.arprastandroid.R
 import com.google.android.material.textview.MaterialTextView
 import com.rengwuxian.materialedittext.MaterialEditText
@@ -54,9 +53,8 @@ class LoginFragment : Fragment() {
         buttonLogin.setOnClickListener {
             val inputUsername = root.findViewById<MaterialEditText>(R.id.login_input_username_or_email)
             val inputPassword = root.findViewById<MaterialEditText>(R.id.login_input_password)
-            Log.d(PreferanceVariable.DEBUG_NAME, "ini username : ${inputUsername.text} dan password : ${inputPassword.text}")
+            Log.d(PreferanceVariable.DEBUG_NAME, "username : ${inputUsername.text} dan password : ${inputPassword.text}")
             if (inputUsername.text!!.toString() == ("ari12345678") && inputPassword.text!!.toString() == ("ari12345678")) {
-                Utils.showTost(context, "password sudah benar")
                 openFragment(HomeViewFragment())
             }
         }
@@ -66,7 +64,7 @@ class LoginFragment : Fragment() {
         text.movementMethod = (object : TextViewLinkHandler(),
             MovementMethod {
             override fun onLinkClick(url: String?) {
-                Utils.showTost(context, "hallo")
+               openFragment(SignUpFragment())
             }
         })
         fragmentManager = (context as FragmentActivity).supportFragmentManager

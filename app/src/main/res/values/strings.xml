@@ -34,9 +34,17 @@
     <string name="input_customer_estimation_date">Estimation Date</string>
 
     <string name="login_submit_button">Login</string>
-    <string name="login_input_username_or_email">Username or Email</string>
+    <string name="login_input_username_or_email">Input Username or phone number</string>
     <string name="login_input_password">Password</string>
     <string name="login_register">To register click here for <a href='https://google.com' style='color: #03A9F4;text-decoration:none' >sign up</a></string>
+
+    <string name="sign_up_create_new_account">Create New Account</string>
+    <string name="sign_up_username">Username</string>
+    <string name="sign_up_telegram_id">Telegram number</string>
+    <string name="sign_up_password">Password</string>
+    <string name="sign_up_confirmation_password">Confirmation Password</string>
+    <string name="sign_up_gender">Gender</string>
+    <string name="sign_up_button_save">Sign Up</string>
 
     <color name="whiteColor">#ffffff</color>
     <color name="redColor">#E80505</color>
