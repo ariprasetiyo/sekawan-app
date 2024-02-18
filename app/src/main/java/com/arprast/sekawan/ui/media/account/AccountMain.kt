@@ -28,7 +28,7 @@ class AccountMain : Fragment() {
     }
 
     private fun openFragment(fragment: Fragment) {
-        val transaction = getActivity()?.supportFragmentManager?.beginTransaction()
+        val transaction = activity?.supportFragmentManager?.beginTransaction()
         transaction?.replace(R.id.container, fragment)
         transaction?.addToBackStack(null)
         transaction?.commit()
@@ -36,23 +36,22 @@ class AccountMain : Fragment() {
 
     private fun setBottomNavigationView(bottomNavigationView: BottomNavigationView, it : FragmentActivity) {
 
-        bottomNavigationView.setOnNavigationItemSelectedListener(object :
-            BottomNavigationView.OnNavigationItemSelectedListener {
-            override fun onNavigationItemSelected(menuItem: MenuItem): Boolean {
-                when (menuItem.getItemId()) {
-                    R.id.account_bottom_menu_list -> {
-                        openFragment(AccountList(bottomNavigationView, it))
-                    }
-                    R.id.account_bottom_menu_add -> {
-                        openFragment(AddAccount(-1))
-                    }
-                    R.id.account_bottom_menu_help -> {
-                        tostText("Not yet support")
-                    }
+        bottomNavigationView.setOnNavigationItemSelectedListener { menuItem ->
+            when (menuItem.itemId) {
+                R.id.account_bottom_menu_list -> {
+                    openFragment(AccountList(bottomNavigationView, it))
                 }
-                return true
+
+                R.id.account_bottom_menu_add -> {
+                    openFragment(AddAccount(-1))
+                }
+
+                R.id.account_bottom_menu_help -> {
+                    tostText("Not yet support")
+                }
             }
-        })
+            true
+        }
     }
 
     private fun tostText(text: String) {

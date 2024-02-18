@@ -36,7 +36,7 @@
     <string name="login_submit_button">Login</string>
     <string name="login_input_username_or_email">Username or Email</string>
     <string name="login_input_password">Password</string>
-    <string name="login_register">To register click here for <![CDATA[ <a href="" style="color: #03A9F4;text-decoration:none" >sign up</a> ]]></string>
+    <string name="login_register">To register click here for <a href='https://google.com' style='color: #03A9F4;text-decoration:none' >sign up</a></string>
 
     <color name="whiteColor">#ffffff</color>
     <color name="redColor">#E80505</color>

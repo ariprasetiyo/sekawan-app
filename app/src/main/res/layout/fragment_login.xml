@@ -4,6 +4,7 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:orientation="vertical"
+    android:id="@+id/container"
     android:padding="16dp">
 
     <LinearLayout
@@ -24,7 +25,7 @@
             app:srcCompat="@mipmap/ic_login" />
 
         <com.rengwuxian.materialedittext.MaterialEditText
-            android:id="@+id/input_account_title"
+            android:id="@+id/login_input_username_or_email"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:hint="@string/login_input_username_or_email"
@@ -36,7 +37,7 @@
 
         <com.google.android.material.textfield.TextInputLayout
             xmlns:app="http://schemas.android.com/apk/res-auto"
-            android:id="@+id/etPasswordLayout"
+            android:id="@+id/login_password"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:hint="@string/login_input_password"
@@ -49,7 +50,7 @@
 
             <!-- dropdown account type-->
             <com.rengwuxian.materialedittext.MaterialEditText
-                android:id="@+id/input_account_username"
+                android:id="@+id/login_input_password"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:inputType="textPassword"
@@ -60,7 +61,7 @@
         </com.google.android.material.textfield.TextInputLayout>
 
         <Button
-            android:id="@+id/save_account_button"
+            android:id="@+id/login_sign_in"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:text="@string/login_submit_button"
@@ -68,6 +69,7 @@
             android:textSize="16sp" />
 
         <com.google.android.material.textview.MaterialTextView
+            android:id="@+id/login_sign_up"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:gravity="center"
