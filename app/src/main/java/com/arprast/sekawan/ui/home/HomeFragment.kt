@@ -110,14 +110,11 @@ class HomeFragment : Fragment() {
 
         registerId = RegistrationActivityType.OPEN_CAM_FOR_PHOTO
         val values = ContentValues()
-        values.put(MediaStore.Images.Media.DISPLAY_NAME, "testing");
+        values.put(MediaStore.Images.Media.DISPLAY_NAME, "capture_image_${System.currentTimeMillis()}");
         values.put(MediaStore.Images.Media.DESCRIPTION, "this is description");
         values.put(MediaStore.Images.Media.MIME_TYPE, "image/jpeg")
 
-        imageUri = fragmentActivity.contentResolver.insert(
-            MediaStore.Images.Media.EXTERNAL_CONTENT_URI,
-            values
-        )!!
+        imageUri = fragmentActivity.contentResolver.insert(MediaStore.Images.Media.EXTERNAL_CONTENT_URI, values)!!
         val cameraIntent = Intent(MediaStore.ACTION_IMAGE_CAPTURE)
         cameraIntent.putExtra(MediaStore.EXTRA_OUTPUT, imageUri)
 //        activity?.setResult(Activity.RESULT_OK)
