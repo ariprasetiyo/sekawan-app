@@ -19,7 +19,7 @@ class SekawanBERestAdapter(
 
     fun getInterface(): SekawanBEApi {
         val serverUrl = config.getString(config_server_url, null)!!
-        val timeout = config.getLong(config_server_request_timeout, 1000L)
+        val timeout = config.getLong(config_server_request_timeout, 30000L)
         return createRetrofit(
             serverUrl,
             verifiedDomainList,

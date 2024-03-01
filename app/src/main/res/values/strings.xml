@@ -26,6 +26,7 @@
     <string name="button_save">Save</string>
 
     <string name="input_customer_title">Input data customer</string>
+    <string name="input_customer_trx_no">Trx No</string>
     <string name="input_customer_name">Customer Name</string>
     <string name="input_customer_name_warning">Customer name cant empty</string>
     <string name="input_customer_phone_number">Phone Number</string>
