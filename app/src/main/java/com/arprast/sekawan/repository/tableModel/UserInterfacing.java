@@ -1,4 +1,4 @@
-package com.arprast.sekawan.model;
+package com.arprast.sekawan.repository.tableModel;
 
 import java.util.Date;
 

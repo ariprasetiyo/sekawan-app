@@ -28,10 +28,10 @@ import androidx.security.crypto.EncryptedSharedPreferences
 import androidx.security.crypto.MasterKeys
 import com.arprast.sekawan.httpClient.SekawanBEApi
 import com.arprast.sekawan.httpClient.SekawanBERestAdapter
-import com.arprast.sekawan.model.UserInterfacing
+import com.arprast.sekawan.repository.tableModel.UserInterfacing
 import com.arprast.sekawan.paymo.SecurityUtils
 import com.arprast.sekawan.paymo.VerifiedDomain
-import com.arprast.sekawan.repository.AccountRepository
+import com.arprast.sekawan.repository.RealmDBRepository
 import com.arprast.sekawan.service.GetTokenService
 import com.arprast.sekawan.service.LoginService
 import com.arprast.sekawan.type.GenderType
@@ -78,7 +78,8 @@ open class MainActivity : AppCompatActivity() {
         LocalBroadcastManager.getInstance(this)
             .registerReceiver(broadcastReceiver, IntentFilter(BOARDCAST_MESSGAE_MAIN));
 
-        if (true) {
+        val authTable = RealmDBRepository().getAuth()
+        if (authTable == null || authTable.token.isBlank() || authTable.userId.isBlank() ) {
             openLogin()
         } else {
             openHome()
@@ -168,9 +169,8 @@ open class MainActivity : AppCompatActivity() {
         val userInterfacing = UserInterfacing()
         userInterfacing.menuId = UserInterfaceType.SHOW_CREDENTIAL.stringValue
         userInterfacing.isDisabled = true
-        AccountRepository().insertUpdateUserInterfacing(userInterfacing)
+        RealmDBRepository().insertUpdateUserInterfacing(userInterfacing)
     }
-
 
     @RequiresApi(Build.VERSION_CODES.O)
     private fun initConfigPreference() {

@@ -1,9 +1,10 @@
 package com.arprast.sekawan.dao
 
 import androidx.lifecycle.LiveData
-import com.arprast.sekawan.model.Account
-import com.arprast.sekawan.model.UserInterfacing
+import com.arprast.sekawan.repository.tableModel.AccountTable
+import com.arprast.sekawan.repository.tableModel.UserInterfacing
 import com.arprast.sekawan.repository.RealmLiveData
+import com.arprast.sekawan.repository.tableModel.AuthTable
 import com.arprast.sekawan.util.PreferanceVariable.Companion.ID
 import com.arprast.sekawan.util.PreferanceVariable.Companion.MENU_ID_FIELD
 import io.realm.Realm
@@ -19,24 +20,35 @@ class RealmLiveDataDao(val realm: Realm) {
     fun <T : RealmModel> RealmResults<T>.asLiveData() =
         RealmLiveData<T>(this)
 
-    fun saveAccount(account: Account): Boolean {
+    fun saveAuth(authTable : AuthTable) : Boolean{
         return !realm.executeTransactionAsync {
-            it.insertOrUpdate(account)
+            it.insertOrUpdate(authTable)
+        }.isCancelled
+    }
+
+    fun getAuth(): AuthTable? {
+        return realm.where(AuthTable::class.java)
+            .findFirst()
+    }
+
+    fun saveAccount(accountTable: AccountTable): Boolean {
+        return !realm.executeTransactionAsync {
+            it.insertOrUpdate(accountTable)
         }.isCancelled
     }
 
     /**
      * Get all accounts
      */
-    fun getAccounts(account: Account): LiveData<RealmResults<Account>> {
-        return realm.where(Account::class.java)
+    fun getAccounts(accountTable: AccountTable): LiveData<RealmResults<AccountTable>> {
+        return realm.where(AccountTable::class.java)
 //            .equalTo("accountType", account.accountType)
             .findAllAsync().asLiveData()
     }
 
-    fun getAccount(account: Account): Account? {
-        return realm.where(Account::class.java)
-            .equalTo(ID, account.id)
+    fun getAccount(accountTable: AccountTable): AccountTable? {
+        return realm.where(AccountTable::class.java)
+            .equalTo(ID, accountTable.id)
             .findFirst()
     }
 
@@ -54,9 +66,9 @@ class RealmLiveDataDao(val realm: Realm) {
             .findAllAsync().asLiveData()
     }
 
-    fun deleteAccount(account: Account) {
+    fun deleteAccount(accountTable: AccountTable) {
         realm.executeTransactionAsync {
-            val result = it.where(account::class.java).equalTo(ID, account.id).findFirst()
+            val result = it.where(accountTable::class.java).equalTo(ID, accountTable.id).findFirst()
             result?.deleteFromRealm()
         }
     }

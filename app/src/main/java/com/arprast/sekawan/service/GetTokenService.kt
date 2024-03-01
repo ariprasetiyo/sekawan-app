@@ -13,6 +13,8 @@ import com.arprast.sekawan.paymo.model.AuthCredRequest
 import com.arprast.sekawan.paymo.request.GetTokenRequest
 import com.arprast.sekawan.paymo.request.GetTokenRequestDetail
 import com.arprast.sekawan.paymo.response.TokenResponse
+import com.arprast.sekawan.repository.RealmDBRepository
+import com.arprast.sekawan.repository.tableModel.AuthTable
 import com.arprast.sekawan.util.BOARDCAST_MESSGAE_MAIN
 import com.arprast.sekawan.util.BOARDCAST_MESSGAE_MAIN_PUT_EXTRA_USER_ID
 import com.arprast.sekawan.util.PreferanceVariable
@@ -24,17 +26,18 @@ import com.google.gson.Gson
 import retrofit2.Call
 import retrofit2.Callback
 import retrofit2.Response
+import java.util.Date
 import java.util.UUID
 
 
-class GetTokenService (
+class GetTokenService(
     private val config: SharedPreferences,
     private val gson: Gson,
     private var sekawanBEApi: SekawanBEApi,
-    private var context : Context
+    private var context: Context
 ) {
 
-    fun initGetToken(phoneNo: String, password: String): Boolean {
+    fun initGetToken(phoneNo: String, password: String) {
 
         val requestTime = System.currentTimeMillis()
         val encryptionKey = config.getString(config_server_encryption_key, null)!!
@@ -43,7 +46,7 @@ class GetTokenService (
         val clientKey = config.getString(config_server_client_key, null)!!
         val getTokenRequest = buildGetTokenRequest(phoneNo, password, encryptionKey, requestTime)
 
-        //async process
+        //http async process
         val tokenResponse = sekawanBEApi.getToken(
             getTokenRequest.requestId,
             clientId,
@@ -51,27 +54,37 @@ class GetTokenService (
             getTokenRequest
         )
 
-        var isSuccessLogin = false
         tokenResponse.enqueue(object : Callback<TokenResponse?> {
 
             override fun onResponse(
                 call: Call<TokenResponse?>,
                 response: Response<TokenResponse?>
             ) {
-                Log.d(PreferanceVariable.DEBUG_NAME, "token response : $response")
-                if(response.body() != null && response.body()!!.responseCode == 200 && response.body()!!.body.token != null ){
-                    val intent = Intent(BOARDCAST_MESSGAE_MAIN)
-                    intent.putExtra(BOARDCAST_MESSGAE_MAIN_PUT_EXTRA_USER_ID, response.body()!!.body.userId)
-                    LocalBroadcastManager.getInstance(context).sendBroadcast(intent)
+                if (response.body() != null && response.body()!!.responseCode == 200 && response.body()!!.body.token != null) {
+                    saveAuthToken(requestTime, response.body()!!)
+                    broadcastMessage(response.body()!!)
                 }
             }
 
             override fun onFailure(call: Call<TokenResponse?>, t: Throwable) {
                 Log.d(PreferanceVariable.DEBUG_NAME, "error response get token", t)
             }
-
         })
-        return isSuccessLogin
+    }
+
+    private fun saveAuthToken(requestTime: Long, response: TokenResponse) {
+        val authTable = AuthTable()
+        authTable.createDate = Date(requestTime)
+        authTable.updateDate = Date(requestTime)
+        authTable.token = response.body.token
+        authTable.userId = response.body.userId
+        RealmDBRepository().saveAuth(authTable)
+    }
+
+    private fun broadcastMessage(response: TokenResponse) {
+        val intent = Intent(BOARDCAST_MESSGAE_MAIN)
+        intent.putExtra(BOARDCAST_MESSGAE_MAIN_PUT_EXTRA_USER_ID, response.body.userId)
+        LocalBroadcastManager.getInstance(context).sendBroadcast(intent)
     }
 
     private fun buildGetTokenRequest(

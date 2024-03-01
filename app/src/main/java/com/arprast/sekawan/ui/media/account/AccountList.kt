@@ -16,8 +16,8 @@ import androidx.fragment.app.Fragment
 import androidx.fragment.app.FragmentActivity
 import androidx.lifecycle.Observer
 import com.arprast.sekawan.MainActivity
-import com.arprast.sekawan.model.Account
-import com.arprast.sekawan.repository.AccountRepository
+import com.arprast.sekawan.repository.tableModel.AccountTable
+import com.arprast.sekawan.repository.RealmDBRepository
 import com.arprast.sekawan.type.AccountType
 import com.arprast.sekawan.ui.media.account.facebook.FacebookMainFragment
 import com.arprast.sekawan.ui.media.account.instagram.InstagramMainFragment
@@ -49,11 +49,11 @@ class AccountList(bottomNavigationView: BottomNavigationView?, it: FragmentActiv
         val accountType: ArrayList<AccountType> = ArrayList()
         val accountId: ArrayList<Long> = ArrayList()
 
-        val account = Account()
-        account.accountType = AccountType.YOUTUBE.stringValue
+        val accountTable = AccountTable()
+        accountTable.accountType = AccountType.YOUTUBE.stringValue
 
-        AccountRepository().getAccounts(account)
-            .observe(it, Observer<RealmResults<Account>> { t ->
+        RealmDBRepository().getAccounts(accountTable)
+            .observe(it, Observer<RealmResults<AccountTable>> { t ->
                 for (accountData in t) {
                     usernameList.add(accountData.username)
                     passwordList.add(accountData.password)
@@ -158,9 +158,9 @@ class AccountList(bottomNavigationView: BottomNavigationView?, it: FragmentActiv
 
     private fun deleteAccount(accountId : Long) {
 
-        val account = Account()
-        account.id = accountId
-        AccountRepository().deleteAccount(account)
+        val accountTable = AccountTable()
+        accountTable.id = accountId
+        RealmDBRepository().deleteAccount(accountTable)
         openFragment(AccountList(bottomNavigationView, it))
     }
 

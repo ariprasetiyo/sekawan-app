@@ -1,10 +1,10 @@
-package com.arprast.sekawan.model
+package com.arprast.sekawan.repository.tableModel
 
 import io.realm.RealmObject
 import io.realm.annotations.PrimaryKey
 import java.util.*
 
-open class Account : RealmObject() {
+open class AccountTable : RealmObject() {
     @PrimaryKey
     var id: Long = 0
     lateinit var title: String

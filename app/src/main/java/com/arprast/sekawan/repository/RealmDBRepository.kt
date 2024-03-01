@@ -5,57 +5,66 @@ import androidx.lifecycle.LiveData
 import androidx.lifecycle.ViewModel
 import com.arprast.sekawan.dao.Dao
 import com.arprast.sekawan.dao.RealmLiveDataDao
-import com.arprast.sekawan.model.Account
-import com.arprast.sekawan.model.UserInterfacing
+import com.arprast.sekawan.repository.tableModel.AccountTable
+import com.arprast.sekawan.repository.tableModel.AuthTable
+import com.arprast.sekawan.repository.tableModel.UserInterfacing
 import com.arprast.sekawan.util.PreferanceVariable.Companion.DEBUG_NAME
 import io.realm.Realm
 import io.realm.RealmResults
 import java.util.*
 
-class AccountRepository : ViewModel() {
+class RealmDBRepository : ViewModel() {
 
-    fun Realm.accountDao(): RealmLiveDataDao =
+    fun Realm.dataDao(): RealmLiveDataDao =
         RealmLiveDataDao(this)
 
     val realm: Realm by lazy {
         Realm.getDefaultInstance()
     }
 
-    fun saveUpdateAccount(account: Account, isUpdate: Boolean): Boolean {
-        val deleteAccount = Account()
-        deleteAccount.id = account.id
-        val isSaveSuccess = saveAccount(account)
+    fun saveAuth(authTable : AuthTable) : Boolean{
+        return realm.dataDao().saveAuth(authTable)
+    }
+
+    fun getAuth() : AuthTable?{
+        return realm.dataDao().getAuth()
+    }
+
+    fun saveUpdateAccount(accountTable: AccountTable, isUpdate: Boolean): Boolean {
+        val deleteAccountTable = AccountTable()
+        deleteAccountTable.id = accountTable.id
+        val isSaveSuccess = saveAccount(accountTable)
         if (isSaveSuccess && isUpdate) {
-            deleteAccount(deleteAccount)
+            deleteAccount(deleteAccountTable)
         }
         return isSaveSuccess
     }
 
-    private fun saveAccount(account: Account): Boolean {
-        account.id = Calendar.getInstance().timeInMillis
-        account.createDate = Date()
-        Log.i(DEBUG_NAME, "dsbe success account=${account.id}")
-        return realm.accountDao().saveAccount(account)
+    private fun saveAccount(accountTable: AccountTable): Boolean {
+        accountTable.id = Calendar.getInstance().timeInMillis
+        accountTable.createDate = Date()
+        Log.i(DEBUG_NAME, "dsbe success account=${accountTable.id}")
+        return realm.dataDao().saveAccount(accountTable)
     }
 
-    fun getAccounts(account: Account): LiveData<RealmResults<Account>> {
-        return realm.accountDao().getAccounts(account)
+    fun getAccounts(accountTable: AccountTable): LiveData<RealmResults<AccountTable>> {
+        return realm.dataDao().getAccounts(accountTable)
     }
 
-    fun getAccount(account: Account): Account {
-        val account = realm.accountDao().getAccount(account)
+    fun getAccount(accountTable: AccountTable): AccountTable {
+        val account = realm.dataDao().getAccount(accountTable)
         if (account == null || account.id <= 0) {
-            return Account()
+            return AccountTable()
         }
         return account
     }
 
-    fun deleteAccount(account: Account) {
-        realm.accountDao().deleteAccount(account)
+    fun deleteAccount(accountTable: AccountTable) {
+        realm.dataDao().deleteAccount(accountTable)
     }
 
-    fun updateAccount(account: Account) {
-        realm.accountDao().deleteAccount(account)
+    fun updateAccount(accountTable: AccountTable) {
+        realm.dataDao().deleteAccount(accountTable)
     }
 
     fun insertUpdateUserInterfacing(userInterfacing: UserInterfacing) {

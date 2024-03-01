@@ -2,8 +2,8 @@ package com.arprast.sekawan.dao;
 
 import android.util.Log;
 
-import com.arprast.sekawan.model.Account;
-import com.arprast.sekawan.model.UserInterfacing;
+import com.arprast.sekawan.repository.tableModel.AccountTable;
+import com.arprast.sekawan.repository.tableModel.UserInterfacing;
 
 import io.realm.Realm;
 
@@ -77,29 +77,29 @@ public class Dao {
         });
     }
 
-    public void updateAccount(final Account account) {
+    public void updateAccount(final AccountTable accountTable) {
         realm.executeTransactionAsync(new Realm.Transaction() {
             @Override
             public void execute(Realm realm) {
-                Account accountUpdate = realm.where(Account.class)
-                        .equalTo(ID, account.getId())
+                AccountTable accountTableUpdate = realm.where(AccountTable.class)
+                        .equalTo(ID, accountTable.getId())
                         .findFirst();
 
-                accountUpdate.setAccountType(account.getAccountType());
-                accountUpdate.setDescription(account.getDescription());
-                accountUpdate.setPassword(account.getPassword());
-                accountUpdate.setTitle(account.getTitle());
-                accountUpdate.setUsername(account.getUsername());
+                accountTableUpdate.setAccountType(accountTable.getAccountType());
+                accountTableUpdate.setDescription(accountTable.getDescription());
+                accountTableUpdate.setPassword(accountTable.getPassword());
+                accountTableUpdate.setTitle(accountTable.getTitle());
+                accountTableUpdate.setUsername(accountTable.getUsername());
             }
         }, new Realm.Transaction.OnSuccess() {
             @Override
             public void onSuccess() {
-                Log.i(DEBUG_NAME, "Update success :" + account.toString());
+                Log.i(DEBUG_NAME, "Update success :" + accountTable.toString());
             }
         }, new Realm.Transaction.OnError() {
             @Override
             public void onError(Throwable error) {
-                Log.e(DEBUG_NAME, "Update error: " + account.toString(), error);
+                Log.e(DEBUG_NAME, "Update error: " + accountTable.toString(), error);
 
             }
         });

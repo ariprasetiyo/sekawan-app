@@ -9,8 +9,8 @@ import android.view.ViewGroup
 import android.webkit.*
 import androidx.annotation.RequiresApi
 import androidx.fragment.app.Fragment
-import com.arprast.sekawan.model.UserInterfacing
-import com.arprast.sekawan.repository.AccountRepository
+import com.arprast.sekawan.repository.tableModel.UserInterfacing
+import com.arprast.sekawan.repository.RealmDBRepository
 import com.arprast.sekawan.type.UserInterfaceType
 import com.arprast.sekawan.util.PreferanceVariable
 import com.arprast.sekawan.util.PreferanceVariable.Companion.DEBUG_NAME
@@ -81,7 +81,7 @@ class TwitterMainFragment(username: String, password: String) : Fragment() {
                     val userInterfacing = UserInterfacing()
                     userInterfacing.menuId = UserInterfaceType.SHOW_CREDENTIAL.stringValue
                     userInterfacing.isDisabled = false
-                    AccountRepository().updateUserInterface(userInterfacing)
+                    RealmDBRepository().updateUserInterface(userInterfacing)
                 }
 
 //                return super.shouldInterceptRequest(webview, webrequest);

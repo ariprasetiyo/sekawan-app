@@ -12,8 +12,8 @@ import android.widget.*
 import androidx.fragment.app.Fragment
 import com.arprast.sekawan.MainActivity
 import com.arprastandroid.R
-import com.arprast.sekawan.model.Account
-import com.arprast.sekawan.repository.AccountRepository
+import com.arprast.sekawan.repository.tableModel.AccountTable
+import com.arprast.sekawan.repository.RealmDBRepository
 import com.arprast.sekawan.type.AccountType
 import com.arprast.sekawan.util.PreferanceVariable
 
@@ -91,16 +91,16 @@ class AddAccount(accountId: Long) : Fragment() {
         inputYoutubeDesc: EditText,
         inputAccountType: AutoCompleteTextView
     ) {
-        var account = Account()
-        account.id = accountId
-        account = AccountRepository().getAccount(account)
+        var accountTable = AccountTable()
+        accountTable.id = accountId
+        accountTable = RealmDBRepository().getAccount(accountTable)
 
-        inputYoutubePassword.setText(account.password)
-        inputYoutubeReEntryPassword.setText(account.password)
-        inputYoutubeTitle.setText(account.title)
-        inputYoutubeUsername.setText(account.username)
-        inputYoutubeDesc.setText(account.description)
-        inputAccountType.setText(account.accountType)
+        inputYoutubePassword.setText(accountTable.password)
+        inputYoutubeReEntryPassword.setText(accountTable.password)
+        inputYoutubeTitle.setText(accountTable.title)
+        inputYoutubeUsername.setText(accountTable.username)
+        inputYoutubeDesc.setText(accountTable.description)
+        inputAccountType.setText(accountTable.accountType)
 
     }
 
@@ -163,15 +163,15 @@ class AddAccount(accountId: Long) : Fragment() {
         val youtubePassword = inputYoutubePassword.text.toString()
         val youtubeDescription = inputYoutubeDesc.text.toString()
 
-        val account = Account()
-        account.title = youtubeTitle
-        account.username = youtubeUsername
-        account.password = youtubePassword
-        account.description = youtubeDescription
-        account.accountType = inputAccountType.text.toString()
-        account.id = accountId
-        if (isValidateInputData(account, inputYoutubeReEntryPassword.text.toString())) {
-            if (AccountRepository().saveUpdateAccount(account, isUpdate)) {
+        val accountTable = AccountTable()
+        accountTable.title = youtubeTitle
+        accountTable.username = youtubeUsername
+        accountTable.password = youtubePassword
+        accountTable.description = youtubeDescription
+        accountTable.accountType = inputAccountType.text.toString()
+        accountTable.id = accountId
+        if (isValidateInputData(accountTable, inputYoutubeReEntryPassword.text.toString())) {
+            if (RealmDBRepository().saveUpdateAccount(accountTable, isUpdate)) {
                 tostText("Save success")
             } else {
                 tostText("Save fail")
@@ -179,16 +179,16 @@ class AddAccount(accountId: Long) : Fragment() {
         }
     }
 
-    private fun isValidateInputData(account: Account, reEntryPassword: String): Boolean {
+    private fun isValidateInputData(accountTable: AccountTable, reEntryPassword: String): Boolean {
         if (!isValidateYoutubeAccount(
-                account.title,
-                account.username,
-                account.password,
-                account.description
+                accountTable.title,
+                accountTable.username,
+                accountTable.password,
+                accountTable.description
             )
         ) return false
 
-        if (!account.password.equals(reEntryPassword)) {
+        if (!accountTable.password.equals(reEntryPassword)) {
             tostText("Password not match. Please check your password !")
             return false
         }
