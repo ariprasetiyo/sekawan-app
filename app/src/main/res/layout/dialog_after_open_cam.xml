@@ -18,21 +18,31 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:gravity="center"
-            android:paddingTop="@dimen/nav_header_vertical_spacing"
+            android:paddingTop="@dimen/padding_medium"
             android:text="@string/input_customer_title"
             android:textAppearance="@style/TextAppearance.AppCompat.Body2"
             android:textColor="@color/blue"
             android:textSize="25sp" />
 
         <com.google.android.material.textview.MaterialTextView
+            android:id="@+id/input_customer_view_trx_date"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:gravity="center"
-            android:paddingTop="@dimen/nav_header_vertical_spacing"
-            android:text="@string/input_customer_trx_no"
+            android:paddingTop="@dimen/padding_medium"
             android:textAppearance="@style/TextAppearance.AppCompat.Body2"
             android:textColor="@color/blue"
-            android:textSize="25sp" />
+            android:textSize="16sp" />
+
+        <com.google.android.material.textview.MaterialTextView
+            android:id="@+id/input_customer_view_trx_no"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:gravity="center"
+            android:paddingTop="@dimen/padding_medium"
+            android:textAppearance="@style/TextAppearance.AppCompat.Body2"
+            android:textColor="@color/movieTitle"
+            android:textSize="16sp" />
 
         <com.rengwuxian.materialedittext.MaterialEditText
             android:id="@+id/input_customer_name"
@@ -41,7 +51,7 @@
             android:hint="@string/input_customer_name"
             android:textSize="16sp"
             app:met_floatingLabel="highlight"
-            app:met_maxCharacters="30"
+            app:met_maxCharacters="50"
             app:met_minCharacters="1" />
 
         <com.rengwuxian.materialedittext.MaterialEditText
@@ -51,8 +61,8 @@
             android:hint="@string/input_customer_phone_number"
             android:textSize="16sp"
             app:met_floatingLabel="highlight"
-            app:met_maxCharacters="20"
-            app:met_minCharacters="5" />
+            app:met_maxCharacters="13"
+            app:met_minCharacters="8" />
 
         <com.rengwuxian.materialedittext.MaterialEditText
             android:id="@+id/input_customer_estimation_date"
@@ -61,8 +71,8 @@
             android:hint="@string/input_customer_estimation_date"
             android:textSize="16sp"
             app:met_floatingLabel="highlight"
-            app:met_maxCharacters="20"
-            app:met_minCharacters="5" />
+            app:met_maxCharacters="10"
+            app:met_minCharacters="6" />
 
         <com.rengwuxian.materialedittext.MaterialEditText
             android:id="@+id/input_customer_address"
@@ -71,7 +81,7 @@
             android:hint="@string/input_customer_address"
             android:textSize="16sp"
             app:met_floatingLabel="highlight"
-            app:met_maxCharacters="20"
+            app:met_maxCharacters="100"
             app:met_minCharacters="5" />
 
         <com.rengwuxian.materialedittext.MaterialEditText
@@ -81,7 +91,7 @@
             android:hint="@string/input_customer_note"
             android:textSize="16sp"
             app:met_floatingLabel="highlight"
-            app:met_maxCharacters="20"
+            app:met_maxCharacters="200"
             app:met_minCharacters="5" />
 
     </LinearLayout>
