@@ -11,5 +11,7 @@ const val config_server_client_key = "config_server_client_key"
 
 const val EMPTY_STRING = ""
 const val CREATED_BY = "ariprasetiyo2024"
+const val BOARDCAST_MESSGAE_MAIN = "BOARDCAST_MESSGAE_MAIN"
+const val BOARDCAST_MESSGAE_MAIN_PUT_EXTRA_USER_ID = "BOARDCAST_MESSGAE_MAIN_PUT_EXTRA_USER_ID"
 
 

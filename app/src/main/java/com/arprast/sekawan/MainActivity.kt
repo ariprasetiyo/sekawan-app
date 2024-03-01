@@ -1,5 +1,9 @@
 package com.arprast.sekawan
 
+import android.content.BroadcastReceiver
+import android.content.Context
+import android.content.Intent
+import android.content.IntentFilter
 import android.content.SharedPreferences
 import android.os.Build
 import android.os.Bundle
@@ -14,6 +18,7 @@ import androidx.appcompat.app.AppCompatActivity
 import androidx.appcompat.widget.Toolbar
 import androidx.drawerlayout.widget.DrawerLayout
 import androidx.fragment.app.Fragment
+import androidx.localbroadcastmanager.content.LocalBroadcastManager
 import androidx.navigation.findNavController
 import androidx.navigation.ui.AppBarConfiguration
 import androidx.navigation.ui.navigateUp
@@ -24,32 +29,31 @@ import androidx.security.crypto.MasterKeys
 import com.arprast.sekawan.httpClient.SekawanBEApi
 import com.arprast.sekawan.httpClient.SekawanBERestAdapter
 import com.arprast.sekawan.model.UserInterfacing
-import com.arprast.sekawan.paymo.Request
 import com.arprast.sekawan.paymo.SecurityUtils
-import com.arprast.sekawan.paymo.SecurityUtils.encryptionKeyGenerator
-import com.arprast.sekawan.paymo.SecurityUtils.hmacSHA256
 import com.arprast.sekawan.paymo.VerifiedDomain
-import com.arprast.sekawan.paymo.model.AuthCredRequest
-import com.arprast.sekawan.paymo.request.GetTokenRequest
-import com.arprast.sekawan.paymo.request.GetTokenRequestDetail
-import com.arprast.sekawan.paymo.response.TokenResponse
 import com.arprast.sekawan.repository.AccountRepository
+import com.arprast.sekawan.service.GetTokenService
 import com.arprast.sekawan.service.LoginService
 import com.arprast.sekawan.type.GenderType
 import com.arprast.sekawan.type.UserInterfaceType
+import com.arprast.sekawan.util.BOARDCAST_MESSGAE_MAIN
+import com.arprast.sekawan.util.BOARDCAST_MESSGAE_MAIN_PUT_EXTRA_USER_ID
+import com.arprast.sekawan.util.CREATED_BY
 import com.arprast.sekawan.util.GsonHelper
 import com.arprast.sekawan.util.PreferanceVariable
-import com.arprast.sekawan.util.*
+import com.arprast.sekawan.util.config_server_client_id
+import com.arprast.sekawan.util.config_server_client_key
+import com.arprast.sekawan.util.config_server_client_key_pattern
+import com.arprast.sekawan.util.config_server_encryption_key
+import com.arprast.sekawan.util.config_server_request_timeout
+import com.arprast.sekawan.util.config_server_url
+import com.arprast.sekawan.util.config_server_verified_domain
 import com.arprastandroid.R
 import com.google.android.material.navigation.NavigationView
 import com.google.android.material.textview.MaterialTextView
 import com.rengwuxian.materialedittext.MaterialEditText
 import io.realm.Realm
 import io.realm.RealmConfiguration
-import retrofit2.Call
-import retrofit2.Callback
-import retrofit2.Response
-import java.util.UUID
 
 open class MainActivity : AppCompatActivity() {
 
@@ -58,7 +62,8 @@ open class MainActivity : AppCompatActivity() {
     private val keyGenParameterSpec = MasterKeys.AES256_GCM_SPEC
     private val mainKeyAlias = MasterKeys.getOrCreate(keyGenParameterSpec)
     private var config: SharedPreferences? = null
-    var sekawanBEApi: SekawanBEApi? = null
+    private var sekawanBEApi: SekawanBEApi? = null
+    private var getTokenService: GetTokenService? = null
 
     @RequiresApi(Build.VERSION_CODES.O)
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -68,6 +73,10 @@ open class MainActivity : AppCompatActivity() {
         initRealm()
         initData()
         initRestAdapter()
+        this.getTokenService = GetTokenService(config!!, gson, sekawanBEApi!!, applicationContext)
+        //register broadcast message
+        LocalBroadcastManager.getInstance(this)
+            .registerReceiver(broadcastReceiver, IntentFilter(BOARDCAST_MESSGAE_MAIN));
 
         if (true) {
             openLogin()
@@ -82,16 +91,16 @@ open class MainActivity : AppCompatActivity() {
         // sign in
         val buttonLogin = findViewById<Button>(R.id.login_sign_in)
         buttonLogin.setOnClickListener {
-            val inputUsernameView = findViewById<MaterialEditText>(R.id.login_input_username_or_email)
+            val inputUsernameView =
+                findViewById<MaterialEditText>(R.id.login_input_username_or_email)
             val inputPasswordView = findViewById<MaterialEditText>(R.id.login_input_password)
             val inputUsername = inputUsernameView.text!!.toString()
             val inputPassword = inputPasswordView.text!!.toString()
             Log.d(
-                PreferanceVariable.DEBUG_NAME,"username : $inputUsername dan password : $inputPassword"
+                PreferanceVariable.DEBUG_NAME,
+                "username : $inputUsername dan password : $inputPassword"
             )
-            if (initGetToken(inputUsername, inputPassword)) {
-                openHome()
-            }
+            getTokenService!!.initGetToken(inputUsername, inputPassword)
         }
 
         // signup
@@ -108,7 +117,6 @@ open class MainActivity : AppCompatActivity() {
         setContentView(R.layout.fragment_signup)
         setGenderList()
     }
-
 
     private fun setGenderList() {
         val adapter = ArrayAdapter(
@@ -181,10 +189,16 @@ open class MainActivity : AppCompatActivity() {
             )
             putString(config_server_url, "http://192.168.1.4:8083")
             putInt(config_server_request_timeout, 10000)
-            putString(config_server_encryption_key, get( "qLOdOR-4VOW4YmCL6RMRxbUf1RmvcOZdkGyYl6rODu8="))
-            putString(config_server_client_id, get( "6qWS-aAK0ZfNPklxo2Gi2_o232ugoEdILPKF4hf5w2U="))
-            putString(config_server_client_key_pattern,get("JKSqQ0w9-tvl0CKE1YXJBg=="))
-            putString( config_server_client_key, get("GHVHjia2QaEUGy45vpH9wDgvItiLDj0xhVbZVmklgiDLMghdzwoO5DGlJ5Szvpd81CHyPWBtRspCMyRxRk5Ub1hsIuuqe0P3xFLe-29RrNHeZDkS54rjFtaAGHrzImaHGcsUWPDU5e5WmdX6zff-Fw=="))
+            putString(
+                config_server_encryption_key,
+                get("qLOdOR-4VOW4YmCL6RMRxbUf1RmvcOZdkGyYl6rODu8=")
+            )
+            putString(config_server_client_id, get("6qWS-aAK0ZfNPklxo2Gi2_o232ugoEdILPKF4hf5w2U="))
+            putString(config_server_client_key_pattern, get("JKSqQ0w9-tvl0CKE1YXJBg=="))
+            putString(
+                config_server_client_key,
+                get("GHVHjia2QaEUGy45vpH9wDgvItiLDj0xhVbZVmklgiDLMghdzwoO5DGlJ5Szvpd81CHyPWBtRspCMyRxRk5Ub1hsIuuqe0P3xFLe-29RrNHeZDkS54rjFtaAGHrzImaHGcsUWPDU5e5WmdX6zff-Fw==")
+            )
             commit()
         }
 
@@ -209,73 +223,8 @@ open class MainActivity : AppCompatActivity() {
         return navController.navigateUp(appBarConfiguration) || super.onSupportNavigateUp()
     }
 
-    private fun initGetToken(phoneNo: String, password: String) : Boolean {
-
-        val requestTime = System.currentTimeMillis()
-        val encryptionKey = config!!.getString(config_server_encryption_key, null)!!
-        val clientId = config!!.getString(config_server_client_id, null)!!
-        val clientKeyPattern = config!!.getString(config_server_client_key_pattern, null)!!
-        val clientKey = config!!.getString(config_server_client_key, null)!!
-        val getTokenRequest = buildGetTokenRequest(phoneNo, password, encryptionKey, requestTime)
-
-        //async process
-        val tokenResponse = sekawanBEApi!!.getToken(
-            getTokenRequest.requestId,
-            clientId,
-            buildHMACSHA256GetTokenRequest(clientId, clientKeyPattern, clientKey, getTokenRequest),
-            getTokenRequest
-        )
-
-        var isSuccessLogin = false
-        tokenResponse.enqueue(object : Callback<TokenResponse?> {
-
-            override fun onResponse(
-                call: Call<TokenResponse?>,
-                response: Response<TokenResponse?>
-            ) {
-                Log.d(PreferanceVariable.DEBUG_NAME, "token response : $response")
-                isSuccessLogin = true
-            }
-
-            override fun onFailure(call: Call<TokenResponse?>, t: Throwable) {
-                Log.d(PreferanceVariable.DEBUG_NAME, "error response get token", t)
-            }
-
-        })
-        return isSuccessLogin
-    }
-
-    private fun buildHMACSHA256GetTokenRequest(clientId : String, clientKeyPattern : String, clientKey : String, getTokenRequest: GetTokenRequest) : String{
-        val secretKeySHA256 = clientId + clientKeyPattern + clientKey
-        return hmacSHA256(secretKeySHA256, gson.toJson(getTokenRequest))
-    }
-
-    private fun buildGetTokenRequest(phoneNo : String, password : String, encryptionKey: String, requestTime : Long ) : GetTokenRequest{
-
-        val authReq = AuthCredRequest()
-        authReq.phoneNo = phoneNo
-        authReq.password = password
-        val authReqInJson = gson.toJson(authReq).toString()
-
-        var cred: String? = null
-        val encryptionKeyFinal = encryptionKeyGenerator(encryptionKey, requestTime)
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
-            cred = SecurityUtils.encryptedAES128(encryptionKeyFinal, authReqInJson)
-        }
-
-        val getTokenRequestDetail = GetTokenRequestDetail()
-        getTokenRequestDetail.cred = cred
-
-        val getTokenRequest = GetTokenRequest()
-        getTokenRequest.requestId = UUID.randomUUID().toString()
-        getTokenRequest.type = Request.TYPE_GENERATE_TOKEN
-        getTokenRequest.requestTime = requestTime
-        getTokenRequest.body = getTokenRequestDetail
-        return getTokenRequest
-    }
-
     @RequiresApi(Build.VERSION_CODES.O)
-    private fun get(text : String) : String{
+    private fun get(text: String): String {
         return SecurityUtils.decryptAES128(CREATED_BY, text)
     }
 
@@ -284,5 +233,13 @@ open class MainActivity : AppCompatActivity() {
         transaction?.replace(R.id.container, fragment)
         transaction?.addToBackStack(null)
         transaction?.commit()
+    }
+
+    //receiver broadcast message
+    private val broadcastReceiver: BroadcastReceiver = object : BroadcastReceiver() {
+        override fun onReceive(context: Context?, intent: Intent) {
+            val userId = intent.getStringExtra(BOARDCAST_MESSGAE_MAIN_PUT_EXTRA_USER_ID)
+            openHome()
+        }
     }
 }
