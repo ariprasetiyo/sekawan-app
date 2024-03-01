@@ -15,8 +15,7 @@ import java.util.*
 
 class RealmDBRepository : ViewModel() {
 
-    fun Realm.dataDao(): RealmLiveDataDao =
-        RealmLiveDataDao(this)
+    fun Realm.dataDao(): RealmLiveDataDao = RealmLiveDataDao(this)
 
     val realm: Realm by lazy {
         Realm.getDefaultInstance()
@@ -28,6 +27,10 @@ class RealmDBRepository : ViewModel() {
 
     fun getAuth() : AuthTable?{
         return realm.dataDao().getAuth()
+    }
+
+    fun deleteAuth(authTable : AuthTable){
+        realm.dataDao().deleteAuth(authTable)
     }
 
     fun saveUpdateAccount(accountTable: AccountTable, isUpdate: Boolean): Boolean {

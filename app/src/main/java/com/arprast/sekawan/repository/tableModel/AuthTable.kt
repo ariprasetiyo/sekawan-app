@@ -6,9 +6,9 @@ import java.util.*
 
 open class AuthTable : RealmObject() {
     @PrimaryKey
-    lateinit var userId: String
-    lateinit var token: String
-    lateinit var roles: String
-    lateinit var createDate: Date
-    lateinit var updateDate: Date
+    var userId: String? = null
+    var token: String? = null
+    var roles: String? = null
+    var createDate: Date? = null
+    var updateDate: Date? = null
 }

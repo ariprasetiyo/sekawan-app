@@ -7,6 +7,7 @@ import com.arprast.sekawan.repository.RealmLiveData
 import com.arprast.sekawan.repository.tableModel.AuthTable
 import com.arprast.sekawan.util.PreferanceVariable.Companion.ID
 import com.arprast.sekawan.util.PreferanceVariable.Companion.MENU_ID_FIELD
+import com.arprast.sekawan.util.PreferanceVariable.Companion.userId
 import io.realm.Realm
 import io.realm.RealmModel
 import io.realm.RealmResults
@@ -30,6 +31,14 @@ class RealmLiveDataDao(val realm: Realm) {
         return realm.where(AuthTable::class.java)
             .findFirst()
     }
+
+    fun deleteAuth(authTable: AuthTable) {
+        realm.executeTransaction {
+            val result = it.where(AuthTable::class.java).equalTo(userId, authTable.userId).findFirst()
+            result?.deleteFromRealm()
+        }
+    }
+
 
     fun saveAccount(accountTable: AccountTable): Boolean {
         return !realm.executeTransactionAsync {

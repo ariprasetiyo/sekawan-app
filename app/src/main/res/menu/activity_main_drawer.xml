@@ -28,6 +28,10 @@
             android:id="@+id/nav_account"
             android:title="@string/menu_account"
             android:icon="@drawable/mn_ic_account_icon"/>
+        <item
+            android:id="@+id/nav_logout"
+            android:title="@string/menu_logout"
+            android:icon="@drawable/mn_ic_logout"/>
     </group>
 
     <item android:title="Communicate">

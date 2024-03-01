@@ -27,5 +27,7 @@
     <item name="mn_ic_instagram_icon" type="drawable">@mipmap/menu_ic_instagram</item>
     <item name="mn_ic_homeadvisor_icon" type="drawable">@mipmap/menu_ic_homeadvisor</item>
     <item name="mn_ic_account_icon" type="drawable">@mipmap/menu_ic_account</item>
+    <item name="mn_ic_logout" type="drawable">@mipmap/menu_ic_logout</item>
+
 
 </resources>

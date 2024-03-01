@@ -79,7 +79,7 @@ open class MainActivity : AppCompatActivity() {
             .registerReceiver(broadcastReceiver, IntentFilter(BOARDCAST_MESSGAE_MAIN));
 
         val authTable = RealmDBRepository().getAuth()
-        if (authTable == null || authTable.token.isBlank() || authTable.userId.isBlank() ) {
+        if (authTable == null || authTable.token.equals(null) || authTable.userId.equals(null) ) {
             openLogin()
         } else {
             openHome()
@@ -149,7 +149,8 @@ open class MainActivity : AppCompatActivity() {
                 R.id.nav_twitter,
                 R.id.nav_instagram,
                 R.id.nav_youtube,
-                R.id.nav_account
+                R.id.nav_account,
+                R.id.nav_logout
             ), drawerLayout
         )
         setupActionBarWithNavController(navController, appBarConfiguration)
@@ -161,6 +162,8 @@ open class MainActivity : AppCompatActivity() {
         val configuration = RealmConfiguration.Builder()
             .name("arprast.db")
             .schemaVersion(0)
+            .allowQueriesOnUiThread(true)
+            .allowWritesOnUiThread(true)
             .build()
         Realm.setDefaultConfiguration(configuration)
     }
