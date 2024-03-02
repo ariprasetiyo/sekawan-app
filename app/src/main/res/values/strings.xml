@@ -34,7 +34,9 @@
     <string name="input_customer_address">Address</string>
     <string name="input_customer_note">Note</string>
     <string name="input_customer_measure">Measure</string>
+    <string name="input_customer_price_type">Price type</string>
     <string name="input_customer_estimation_date">Estimation Date</string>
+    <string name="input_customer_total_price">0</string>
 
     <string name="login_submit_button">Login</string>
     <string name="login_input_username_or_email">Input Username or phone number</string>

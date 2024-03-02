@@ -1,9 +1,10 @@
 <?xml version="1.0" encoding="utf-8"?>
-<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:id="@+id/container"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
+    android:imeOptions="actionDone"
     android:orientation="vertical"
     android:padding="16dp">
 
@@ -12,7 +13,8 @@
         android:layout_height="match_parent"
         android:gravity="center"
         android:orientation="vertical"
-        android:padding="16dp">
+        android:padding="16dp"
+        android:scrollbarAlwaysDrawVerticalTrack="true">
 
         <com.google.android.material.textview.MaterialTextView
             android:layout_width="match_parent"
@@ -40,9 +42,9 @@
             android:layout_height="wrap_content"
             android:gravity="center"
             android:paddingTop="@dimen/padding_medium"
+            android:paddingBottom="10dp"
             android:textAppearance="@style/TextAppearance.AppCompat.Body2"
             android:textColor="@color/movieTitle"
-            android:paddingBottom="10dp"
             android:textSize="16sp" />
 
         <com.rengwuxian.materialedittext.MaterialEditText
@@ -85,6 +87,22 @@
             app:met_maxCharacters="100"
             app:met_minCharacters="5" />
 
+        <com.rengwuxian.materialedittext.MaterialEditText
+            android:id="@+id/input_customer_note"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:gravity="top|start"
+            android:hint="@string/input_customer_note"
+            android:inputType="textMultiLine"
+            android:lines="3"
+            android:maxLines="3"
+            android:minLines="2"
+            android:scrollbars="vertical"
+            android:textSize="16sp"
+            app:met_floatingLabel="highlight"
+            app:met_maxCharacters="200"
+            app:met_minCharacters="5" />
+
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="72dp"
@@ -93,14 +111,16 @@
             <com.rengwuxian.materialedittext.MaterialEditText
                 android:id="@+id/input_customer_measure_input"
                 android:layout_width="0dp"
-                android:layout_weight=".50"
                 android:layout_height="wrap_content"
                 android:layout_marginTop="-20sp"
                 android:layout_marginRight="10dp"
+                android:layout_alignParentRight="true"
+                android:layout_weight=".50"
+                android:inputType="numberDecimal|numberSigned"
                 android:hint="@string/input_customer_measure"
                 android:textSize="16sp"
                 app:met_floatingLabel="highlight"
-                app:met_maxCharacters="5"
+                app:met_maxCharacters="4"
                 app:met_minCharacters="1" />
 
             <com.google.android.material.textfield.TextInputLayout
@@ -111,37 +131,59 @@
                 android:layout_weight=".50"
                 android:background="@android:color/transparent"
                 android:backgroundTint="@android:color/transparent"
-                android:textColorHint="@color/hintColor"
-                >
+                android:textColorHint="@color/hintColor">
 
                 <AutoCompleteTextView
                     android:id="@+id/input_customer_measure"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:layout_marginTop="-5dp"
                     android:layout_marginStart="0dp"
                     android:layout_marginLeft="0dp"
+                    android:layout_marginTop="-6dp"
                     android:background="@android:color/transparent"
                     android:backgroundTint="@android:color/transparent"
                     android:textSize="16sp" />
             </com.google.android.material.textfield.TextInputLayout>
         </LinearLayout>
 
-        <com.rengwuxian.materialedittext.MaterialEditText
-            android:id="@+id/input_customer_note"
+        <LinearLayout
             android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:gravity="top|start"
-            android:hint="@string/input_customer_note"
-            android:inputType="textMultiLine"
-            android:lines="4"
-            android:maxLines="4"
-            android:minLines="2"
-            android:scrollbars="vertical"
-            android:textSize="16sp"
-            app:met_floatingLabel="highlight"
-            app:met_maxCharacters="200"
-            app:met_minCharacters="5" />
+            android:layout_height="72dp"
+            android:orientation="horizontal">
+
+            <com.google.android.material.textfield.TextInputLayout
+                android:id="@+id/input_customer_price_text_input_layout"
+                style="@style/TextInputLayout.FilledBox"
+                android:layout_width="0dp"
+                android:layout_height="51dp"
+                android:layout_weight=".50"
+                android:textColorHint="@color/hintColor">
+
+                <AutoCompleteTextView
+                    android:id="@+id/input_customer_price_type"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginStart="-5dp"
+                    android:layout_marginTop="-6dp"
+                    android:background="@android:color/transparent"
+                    android:backgroundTint="@android:color/transparent"
+                    android:textSize="16sp" />
+
+
+            </com.google.android.material.textfield.TextInputLayout>
+
+            <com.google.android.material.textview.MaterialTextView
+                android:id="@+id/input_customer_total_price"
+                android:layout_width="0dp"
+                android:layout_height="51dp"
+                android:layout_weight=".50"
+                android:layout_marginTop="-25dp"
+                android:gravity="center"
+                android:text="@string/input_customer_total_price"
+                android:textAppearance="@style/TextAppearance.AppCompat.Body2"
+                android:textColor="@color/blue"
+                android:textSize="16sp" />
+        </LinearLayout>
 
     </LinearLayout>
-</FrameLayout>
+</ScrollView>

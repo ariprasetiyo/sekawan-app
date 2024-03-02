@@ -9,13 +9,16 @@ import android.content.Intent
 import android.net.Uri
 import android.os.Bundle
 import android.provider.MediaStore
+import android.text.Editable
 import android.text.InputFilter
 import android.text.InputType
+import android.text.TextWatcher
 import android.view.Gravity
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.view.inputmethod.EditorInfo
+import android.widget.AdapterView.OnItemClickListener
 import android.widget.ArrayAdapter
 import android.widget.AutoCompleteTextView
 import android.widget.ImageView
@@ -28,9 +31,10 @@ import androidx.fragment.app.FragmentActivity
 import androidx.fragment.app.FragmentManager
 import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProviders
-import com.arprast.sekawan.type.GenderType
+import com.arprast.sekawan.paymo.MoneyHelper
 import com.arprast.sekawan.type.MeasureType
 import com.arprast.sekawan.type.RegistrationActivityType
+import com.arprast.sekawan.util.PRICE_TYPE
 import com.arprast.sekawan.util.Utils
 import com.arprastandroid.R
 import com.bumptech.glide.Glide
@@ -41,6 +45,7 @@ import com.google.android.material.snackbar.Snackbar
 import com.google.android.material.textview.MaterialTextView
 import com.rengwuxian.materialedittext.MaterialEditText
 import java.io.File
+
 
 class HomeFragment : Fragment() {
 
@@ -165,10 +170,12 @@ class HomeFragment : Fragment() {
         val inflater = requireActivity().layoutInflater
 
         val viewAlertDialog = inflater.inflate(R.layout.dialog_after_open_cam, null)
-        val customerTrxDate = viewAlertDialog.findViewById<MaterialTextView>(R.id.input_customer_view_trx_date)
+        val customerTrxDate =
+            viewAlertDialog.findViewById<MaterialTextView>(R.id.input_customer_view_trx_date)
         customerTrxDate.text = "$dateNow"
 
-        val customerTrxNo = viewAlertDialog.findViewById<MaterialTextView>(R.id.input_customer_view_trx_no)
+        val customerTrxNo =
+            viewAlertDialog.findViewById<MaterialTextView>(R.id.input_customer_view_trx_no)
         customerTrxNo.text = "${getString(R.string.input_customer_trx_no)} ${Utils.getTrxNo()}"
 
         val customerName = viewAlertDialog.findViewById<MaterialEditText>(R.id.input_customer_name)
@@ -193,20 +200,67 @@ class HomeFragment : Fragment() {
 
         val customerMeasure =
             viewAlertDialog.findViewById<MaterialEditText>(R.id.input_customer_measure_input)
-        customerMeasure.inputType = (InputType.TYPE_CLASS_NUMBER)
+//        customerMeasure.inputType = (InputType.TYPE_CLASS_NUMBER)
         customerMeasure.filters = (arrayOf<InputFilter>(InputFilter.LengthFilter(5)))
         customerMeasure.isSingleLine = true
 
-        val adapter = ArrayAdapter(
+        customerMeasure.addTextChangedListener(object :
+            TextWatcher {
+            override fun beforeTextChanged(s: CharSequence, start: Int, count: Int, after: Int) {}
+            override fun onTextChanged(s: CharSequence, start: Int, before: Int, count: Int) {}
+            override fun afterTextChanged(s: Editable) {
+                if (s.isNotBlank()) {
+                    setTotalPrice(viewAlertDialog)
+                }
+            }
+        })
+
+        val editTextFilledExposedDropdownAdapter = ArrayAdapter(
             context,
             R.layout.account_type_dropdown_menu,
             MeasureType.values()
         )
-        val editTextFilledExposedDropdown = viewAlertDialog.findViewById<AutoCompleteTextView>(R.id.input_customer_measure)
-        editTextFilledExposedDropdown.filters = (arrayOf<InputFilter>(InputFilter.LengthFilter(1)))
+        val editTextFilledExposedDropdown =
+            viewAlertDialog.findViewById<AutoCompleteTextView>(R.id.input_customer_measure)
+        editTextFilledExposedDropdown.filters = (arrayOf<InputFilter>(InputFilter.LengthFilter(3)))
         editTextFilledExposedDropdown.isSingleLine = true
-        editTextFilledExposedDropdown.setText(adapter.getItem(0)!!.stringValue, true)
-        editTextFilledExposedDropdown.setAdapter(adapter)
+        editTextFilledExposedDropdown.inputType = (InputType.TYPE_NULL)
+        editTextFilledExposedDropdown.setText(
+            editTextFilledExposedDropdownAdapter.getItem(1)!!.stringValue,
+            true
+        )
+        editTextFilledExposedDropdown.setAdapter(editTextFilledExposedDropdownAdapter)
+
+        val priceList = arrayListOf(
+            MoneyHelper.IDR(4000),
+            MoneyHelper.IDR(4500),
+            MoneyHelper.IDR(5000),
+            MoneyHelper.IDR(5500),
+            MoneyHelper.IDR(6000),
+            MoneyHelper.IDR(6500),
+            MoneyHelper.IDR(7000),
+            MoneyHelper.IDR(7500),
+            MoneyHelper.IDR(8000),
+            MoneyHelper.IDR(8500),
+            MoneyHelper.IDR(9000),
+            MoneyHelper.IDR(9500),
+            MoneyHelper.IDR(10000)
+        )
+        val priceTypeAdapter = ArrayAdapter(
+            context,
+            R.layout.account_type_dropdown_menu,
+            priceList
+        )
+        val priceTypeDropDown =
+            viewAlertDialog.findViewById<AutoCompleteTextView>(R.id.input_customer_price_type)
+        priceTypeDropDown.filters = (arrayOf<InputFilter>(InputFilter.LengthFilter(30)))
+        priceTypeDropDown.inputType = (InputType.TYPE_NULL)
+        priceTypeDropDown.isSingleLine = true
+        priceTypeDropDown.setText(PRICE_TYPE, true)
+        priceTypeDropDown.setAdapter(priceTypeAdapter)
+        priceTypeDropDown.onItemClickListener = OnItemClickListener { arg0, view, arg2, arg3 ->
+            setTotalPrice(viewAlertDialog)
+        }
 
         val customerEstimationDate =
             viewAlertDialog.findViewById<MaterialEditText>(R.id.input_customer_estimation_date)
@@ -240,38 +294,28 @@ class HomeFragment : Fragment() {
         builderAlertDialog.create()
         builderAlertDialog.show()
 
+    }
 
-//        val layout = LinearLayout(context)
-//        layout.orientation = LinearLayout.VERTICAL
-//        layout.setPadding(
-//            resources.getDimensionPixelOffset(R.dimen.dp_19),
-//            0,
-//            resources.getDimensionPixelOffset(R.dimen.dp_19),
-//            0
-//        )
-//
-//        layout.addView(inputCustomerName())
-//        layout.addView(inputCustomerPhoneNumber())
-//        layout.addView(inputCustomerEstimationDate())
-//        layout.addView(inputCustomerAddress())
-//        layout.addView(inputCustomerNote())
-//
-//        val dateNow = Utils.getDateNow()
-//        val alert = AlertDialog.Builder(context)
-//            .setTitle("${getString(R.string.input_customer_title)} $dateNow")
-//            .setMessage("Trx No ${Utils.getTrxNo()}")
-//            .setView(layout)
-//            .setPositiveButton(getString(R.string.button_save)) { dialog, _ ->
-//                dialog.cancel()
-//            }
-//            .setNeutralButton(getString(R.string.button_cancel)) { dialog, _ ->
-//                deleteFileImageCam()
-//                dialog.cancel()
-//            }.create()
-//
-//        alert.show()
-//
+    private fun setTotalPrice(viewAlertDialog: View) {
+        val customerMeasure =
+            viewAlertDialog.findViewById<MaterialEditText>(R.id.input_customer_measure_input)
+        val priceType =
+            viewAlertDialog.findViewById<AutoCompleteTextView>(R.id.input_customer_price_type)
+        val totalPrice =
+            viewAlertDialog.findViewById<MaterialTextView>(R.id.input_customer_total_price)
 
+        var priceTypeInDouble = 0.0
+        if (priceType.text.toString() != PRICE_TYPE) {
+            priceTypeInDouble = MoneyHelper.parse(priceType.text.toString()).amount.toDouble()
+        }
+
+        var volumeInDouble = 0.0
+        if (!customerMeasure.text!!.toString().isBlank()) {
+            volumeInDouble = customerMeasure.text.toString().toDouble()
+        }
+
+        val totalPriceInDouble = volumeInDouble * priceTypeInDouble
+        totalPrice.text = MoneyHelper.IDR(totalPriceInDouble).toString()
     }
 
     private fun inputCustomerName(): MaterialEditText {
