@@ -26,13 +26,14 @@
     <string name="button_save">Save</string>
 
     <string name="input_customer_title">Input Data Customer</string>
-    <string name="input_customer_trx_no">Trx No</string>
+    <string name="input_customer_trx_no">No</string>
     <string name="input_customer_name">Customer Name</string>
     <string name="input_customer_name_warning">Customer name cant empty</string>
     <string name="input_customer_phone_number">Phone Number</string>
     <string name="input_customer_phone_number_warning">Please input correct phone number</string>
     <string name="input_customer_address">Address</string>
     <string name="input_customer_note">Note</string>
+    <string name="input_customer_measure">Measure</string>
     <string name="input_customer_estimation_date">Estimation Date</string>
 
     <string name="login_submit_button">Login</string>

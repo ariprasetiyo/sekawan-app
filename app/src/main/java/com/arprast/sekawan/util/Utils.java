@@ -67,7 +67,7 @@ public class Utils {
         final StringBuilder stringBuilder = new StringBuilder();
         stringBuilder.append( yyyyMMddhhmmssWithoutSlash.format(Calendar.getInstance().getTime()));
         stringBuilder.append("-");
-        stringBuilder.append(getRandomString(10));
+        stringBuilder.append(getRandomString(6));
         return stringBuilder.toString();
     }
 
@@ -100,15 +100,23 @@ public class Utils {
             int month = c.get(Calendar.MONTH);
             int day = c.get(Calendar.DAY_OF_MONTH);
 
-
             // Create a new instance of DatePickerDialog and return it
             return new DatePickerDialog(getActivity(), this, year, month, day);
         }
 
         public void onDateSet(DatePicker view, int year, int month, int day) {
 
-            editText.setText(String.valueOf(day) + "/"
-                    + String.valueOf(month + 1) + "/" + String.valueOf(year));
+            String monthInString = String.valueOf(month+1);
+            String dayInString = String.valueOf(day);
+            if(month < 10){
+                monthInString = "0"+month;
+            }
+            if (day < 10){
+                dayInString = "0"+day;
+            }
+
+            editText.setText(dayInString + "/"
+                    + monthInString + "/" + String.valueOf(year));
         }
     }
 

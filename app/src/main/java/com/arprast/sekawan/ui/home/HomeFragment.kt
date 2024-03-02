@@ -16,9 +16,9 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.view.inputmethod.EditorInfo
-import android.widget.EditText
+import android.widget.ArrayAdapter
+import android.widget.AutoCompleteTextView
 import android.widget.ImageView
-import android.widget.LinearLayout
 import android.widget.TextView
 import android.widget.Toast
 import androidx.activity.result.contract.ActivityResultContracts
@@ -28,6 +28,8 @@ import androidx.fragment.app.FragmentActivity
 import androidx.fragment.app.FragmentManager
 import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProviders
+import com.arprast.sekawan.type.GenderType
+import com.arprast.sekawan.type.MeasureType
 import com.arprast.sekawan.type.RegistrationActivityType
 import com.arprast.sekawan.util.Utils
 import com.arprastandroid.R
@@ -165,13 +167,19 @@ class HomeFragment : Fragment() {
         val viewAlertDialog = inflater.inflate(R.layout.dialog_after_open_cam, null)
         val customerTrxDate = viewAlertDialog.findViewById<MaterialTextView>(R.id.input_customer_view_trx_date)
         customerTrxDate.text = "$dateNow"
+
         val customerTrxNo = viewAlertDialog.findViewById<MaterialTextView>(R.id.input_customer_view_trx_no)
         customerTrxNo.text = "${getString(R.string.input_customer_trx_no)} ${Utils.getTrxNo()}"
+
         val customerName = viewAlertDialog.findViewById<MaterialEditText>(R.id.input_customer_name)
+        customerName.filters = (arrayOf<InputFilter>(InputFilter.LengthFilter(50)))
+        customerName.isSingleLine = true
 
         val customerPhoneNo =
             viewAlertDialog.findViewById<MaterialEditText>(R.id.input_customer_phone_number)
         customerPhoneNo.inputType = (InputType.TYPE_CLASS_NUMBER)
+        customerPhoneNo.filters = (arrayOf<InputFilter>(InputFilter.LengthFilter(13)))
+        customerPhoneNo.isSingleLine = true
         customerPhoneNo.onFocusChangeListener = (View.OnFocusChangeListener { _, hasFocus ->
             if (!hasFocus) {
                 val isValidPhoneNo = Utils.isValidPhoneNumber(customerPhoneNo.text.toString())
@@ -183,8 +191,26 @@ class HomeFragment : Fragment() {
             }
         })
 
+        val customerMeasure =
+            viewAlertDialog.findViewById<MaterialEditText>(R.id.input_customer_measure_input)
+        customerMeasure.inputType = (InputType.TYPE_CLASS_NUMBER)
+        customerMeasure.filters = (arrayOf<InputFilter>(InputFilter.LengthFilter(5)))
+        customerMeasure.isSingleLine = true
+
+        val adapter = ArrayAdapter(
+            context,
+            R.layout.account_type_dropdown_menu,
+            MeasureType.values()
+        )
+        val editTextFilledExposedDropdown = viewAlertDialog.findViewById<AutoCompleteTextView>(R.id.input_customer_measure)
+        editTextFilledExposedDropdown.filters = (arrayOf<InputFilter>(InputFilter.LengthFilter(1)))
+        editTextFilledExposedDropdown.isSingleLine = true
+        editTextFilledExposedDropdown.setText(adapter.getItem(0)!!.stringValue, true)
+        editTextFilledExposedDropdown.setAdapter(adapter)
+
         val customerEstimationDate =
-            viewAlertDialog.findViewById<MaterialEditText>(R.id.input_customer_estimation_date);
+            viewAlertDialog.findViewById<MaterialEditText>(R.id.input_customer_estimation_date)
+        customerEstimationDate.filters = (arrayOf<InputFilter>(InputFilter.LengthFilter(10)))
         customerEstimationDate.onFocusChangeListener = (View.OnFocusChangeListener { _, hasFocus ->
             if (hasFocus) {
                 val dialogFragment = Utils.DatePickerFragment(customerEstimationDate)
@@ -193,7 +219,12 @@ class HomeFragment : Fragment() {
         })
         val customerAddress =
             viewAlertDialog.findViewById<MaterialEditText>(R.id.input_customer_address);
+        customerAddress.isSingleLine = true
+        customerAddress.filters = (arrayOf<InputFilter>(InputFilter.LengthFilter(100)))
+
+
         val customerNote = viewAlertDialog.findViewById<MaterialEditText>(R.id.input_customer_note);
+        customerAddress.filters = (arrayOf<InputFilter>(InputFilter.LengthFilter(200)))
 
         val builderAlertDialog = builder.setView(viewAlertDialog)
             // Add action buttons.

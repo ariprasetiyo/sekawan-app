@@ -1,17 +1,17 @@
 <?xml version="1.0" encoding="utf-8"?>
 <FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:id="@+id/container"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:orientation="vertical"
-    android:id="@+id/container"
     android:padding="16dp">
 
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:orientation="vertical"
         android:gravity="center"
+        android:orientation="vertical"
         android:padding="16dp">
 
         <com.google.android.material.textview.MaterialTextView
@@ -42,6 +42,7 @@
             android:paddingTop="@dimen/padding_medium"
             android:textAppearance="@style/TextAppearance.AppCompat.Body2"
             android:textColor="@color/movieTitle"
+            android:paddingBottom="10dp"
             android:textSize="16sp" />
 
         <com.rengwuxian.materialedittext.MaterialEditText
@@ -72,7 +73,7 @@
             android:textSize="16sp"
             app:met_floatingLabel="highlight"
             app:met_maxCharacters="10"
-            app:met_minCharacters="6" />
+            app:met_minCharacters="10" />
 
         <com.rengwuxian.materialedittext.MaterialEditText
             android:id="@+id/input_customer_address"
@@ -84,11 +85,59 @@
             app:met_maxCharacters="100"
             app:met_minCharacters="5" />
 
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="72dp"
+            android:orientation="horizontal">
+
+            <com.rengwuxian.materialedittext.MaterialEditText
+                android:id="@+id/input_customer_measure_input"
+                android:layout_width="0dp"
+                android:layout_weight=".50"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="-20sp"
+                android:layout_marginRight="10dp"
+                android:hint="@string/input_customer_measure"
+                android:textSize="16sp"
+                app:met_floatingLabel="highlight"
+                app:met_maxCharacters="5"
+                app:met_minCharacters="1" />
+
+            <com.google.android.material.textfield.TextInputLayout
+                android:id="@+id/input_customer_measure_text_input_layout"
+                style="@style/TextInputLayout.FilledBox"
+                android:layout_width="0dp"
+                android:layout_height="51dp"
+                android:layout_weight=".50"
+                android:background="@android:color/transparent"
+                android:backgroundTint="@android:color/transparent"
+                android:textColorHint="@color/hintColor"
+                >
+
+                <AutoCompleteTextView
+                    android:id="@+id/input_customer_measure"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="-5dp"
+                    android:layout_marginStart="0dp"
+                    android:layout_marginLeft="0dp"
+                    android:background="@android:color/transparent"
+                    android:backgroundTint="@android:color/transparent"
+                    android:textSize="16sp" />
+            </com.google.android.material.textfield.TextInputLayout>
+        </LinearLayout>
+
         <com.rengwuxian.materialedittext.MaterialEditText
             android:id="@+id/input_customer_note"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
+            android:gravity="top|start"
             android:hint="@string/input_customer_note"
+            android:inputType="textMultiLine"
+            android:lines="4"
+            android:maxLines="4"
+            android:minLines="2"
+            android:scrollbars="vertical"
             android:textSize="16sp"
             app:met_floatingLabel="highlight"
             app:met_maxCharacters="200"
